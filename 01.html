@@ -2,51 +2,22 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>01 2026公民館</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<h1>01 2026公民館 (GIFT)</h1>
-
-<div class="app-container">
-    <div class="player-section">
-        <div id="player" class="video-container"></div>
+    <h1>01 2026公民館</h1>
+    <div class="app-container">
+        <div class="player-section"><div id="player" class="video-container"></div></div>
+        <div class="list-section" id="timestamp-list"></div>
     </div>
-    <div class="list-section" id="timestamp-list"></div>
-</div>
+    <a href="index.html" class="back-link">← 戻る</a>
 
-<a href="index.html" class="back-link">← データベースに戻る</a>
-
-<script>
-    const VIDEO_ID = 'lN17WxlwdTY'; 
-    let player;
-
-    // YouTube Iframe API の読み込み
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    // API準備完了時の処理
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-            videoId: VIDEO_ID,
-            playerVars: { 
-                'playsinline': 1,
-                'rel': 0,
-                'modestbranding': 1
-            },
-            events: {
-                'onReady': onPlayerReady
-            }
-        });
-    }
-
-    // 歌詞・メモデータ
-    const data = [
-        ["00:00", "一番きれいな色ってなんだろう？", ""],
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="script.js"></script>
+    <script>
+        const myData = [
+             ["00:00", "一番きれいな色ってなんだろう？", ""],
         ["00:07", "一番ひかってるものってなんだろう？", ""],
         ["00:13", "僕は探していた 最高のGIFTを", ""],
         ["00:20", "君が喜んだ姿をイメージしながら", ""],
@@ -138,63 +109,19 @@
         ["09:17", "傷をも誇れる花になろう", ""],
         ["09:21", "愛に満ちたこの日々に 何を残そう", ""],
         ["09:27", "そう 今こそ 生まれてきた意味を刻む時だ", "終幕"]
-    ];
+        ];
 
-    const listElement = document.getElementById('timestamp-list');
-    const items = [];
-
-    // リストの生成
-    // リストの生成（この部分を01, 02共通で差し替え）
-    data.forEach(([timeStr, text, memo]) => {
-        const parts = timeStr.split(':').reverse();
-        let seconds = parseInt(parts[0]) + (parseInt(parts[1]) * 60);
-        if (parts[2]) seconds += (parseInt(parts[2]) * 3600);
-
-        const item = document.createElement('div');
-        item.className = 'timestamp-item';
-        
-        // --- 修正：HTML構造を「メイン行」と「メモ行」に分ける ---
-        item.innerHTML = `
-            <div class="item-main">
-                <span class="time-badge">${timeStr}</span>
-                <span class="text-content">${text}</span>
-            </div>
-            <div class="memo-content">${memo}</div>
-        `;
-        
-        item.onclick = () => {
-            // YouTube(01)の場合は player.seekTo、Cloudinary(02)の場合は video.currentTime
-            if (typeof player !== 'undefined' && player.seekTo) {
-                player.seekTo(seconds, true);
-                player.playVideo();
-            } else {
-                video.currentTime = seconds;
-                video.play();
-            }
-        };
-        listElement.appendChild(item);
-        items.push({ seconds, element: item });
-    });
-
-    // 監視タイマー（自動スクロール用）
-    function onPlayerReady() {
-        setInterval(() => {
-            const currentTime = player.getCurrentTime();
-            items.forEach((item, index) => {
-                const nextItem = items[index + 1];
-                const isPlaying = currentTime >= item.seconds && (!nextItem || currentTime < nextItem.seconds);
-                
-                if (isPlaying) {
-                    if (!item.element.classList.contains('playing')) {
-                        item.element.classList.add('playing');
-                        item.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                } else {
-                    item.element.classList.remove('playing');
-                }
+        let player;
+        let app;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'lN17WxlwdTY',
+                events: { 'onReady': () => {
+                    app = initApp(myData, null);
+                    setInterval(() => app.updateHighlight(player.getCurrentTime()), 500);
+                }}
             });
-        }, 500); // 0.5秒ごとにチェック
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
