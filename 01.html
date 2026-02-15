@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01公民館</title>
+    <style>
+        body { font-family: sans-serif; background: #f9f9f9; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .container { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1000px; width: 100%; }
+        .player-section { flex: 1.2; min-width: 320px; position: sticky; top: 20px; height: fit-content; }
+        .list-section { flex: 0.8; min-width: 320px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
+        .video-container { width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; }
+        .timestamp-item { display: flex; align-items: flex-start; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .timestamp-item:hover { background: #f0f0f0; }
+        .time-badge { background: #ff0000; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; margin-right: 12px; font-family: monospace; flex-shrink: 0; }
+        .text-content { font-size: 0.9em; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<h1 style="font-size: 1.2em;">公民館</h1>
+
+<div class="container">
+    <div class="player-section">
+        <div class="video-container" id="player"></div>
+    </div>
+    <div class="list-section" id="timestamp-list"></div>
+</div>
+
+<script>
+    const VIDEO_ID = 'lN17WxlwdTY'; // YouTube動画ID
+    const rawText = `00:00 一番きれいな色ってなんだろう？
+00:07 一番ひかってるものってなんだろう？
+00:13 僕は探していた 最高のGIFTを
+00:20 君が喜んだ姿をイメージしながら
+00:26 ♪ (Instrumental)
+00:37 「本当の自分」を見つけたいって言うけど
+00:44 「生まれた意味」を知りたいって言うけど
+00:50 僕の両手がそれを渡す時
+00:56 ふと謎が解けるといいな 受け取ってくれるかな
+01:07 長い間 君に渡したくて
+01:13 強く握り締めていたから
+01:18 もうグジャグジャになって 色は変わり果て
+01:25 お世辞にもきれいとは言えないけど
+01:30 「白か黒で答えろ」という
+01:35 難題を突きつけられ
+01:38 ぶち当たった壁の前で
+01:42 僕らはまた迷っている 迷ってるけど
+01:50 白と黒のその間に
+01:55 無限の色が広がってる
+01:58 君に似合う色探して やさしい名前をつけたなら
+02:04 ほら 一番きれいな色
+02:09 今 君に贈るよ
+02:13 ♪ (Instrumental)
+02:17 地平線の先に辿り着いても
+02:24 新しい地平線が広がるだけ
+02:30 「もうやめにしようか？」 自分の胸に聞くと
+02:38 「まだ歩き続けたい」と返事が聞こえたよ
+02:47 知らぬ間に増えていった荷物も
+02:53 まだなんとか背負っていけるから
+02:58 君の分まで持つよ だからそばにいてよ
+03:06 それだけで心は軽くなる
+03:11 果てしない旅路の果てに
+03:16 「選ばれる者」とは誰？
+03:19 たとえ僕じゃなくたって
+03:22 それでもまた走っていく 走っていくよ
+03:31 降り注ぐ日差しがあって
+03:35 だからこそ日陰もあって
+03:38 そのすべてが意味を持って
+03:42 互いを讃えているのなら
+03:45 もうどんな場所にいても
+03:50 光を感じれるよ
+03:53 ♪ (Instrumental)
+04:04 今 君に贈るよ 気に入るかなぁ？受け取ってよ
+04:17 君とだから探せたよ 僕の方こそありがとう
+04:31 ♪ (Instrumental)
+04:47 一番きれいな色ってなんだろう？
+04:54 一番ひかってるものってなんだろう？
+04:59 僕は抱きしめる 君がくれたgiftを
+05:07 いつまでも胸の奥で
+05:11 ほら ひかってるんだよ
+05:17 ひかり続けんだよ
+05:40 辿り着く果てまで
+05:44 苦しみは尽きぬけど 歓声に身を任せて
+05:51 期待×不安定 望んで 突き抜けろ
+05:56 広げた腕で待っている 今
+06:03 (Whoa, whoa-oh-oh, whoa)
+06:08 ♪ (Instrumental)
+06:12 記録を付けては体温
+06:14 日差しを浴びていたいよ
+06:17 嫌いにならないで 自分を退けないで
+06:22 唯一無二の人になりたかった
+06:28 あぁ 認めたくないな
+06:30 褒められたかった
+06:35 辿り着く果てなんて
+06:39 あるかわからないけど 感性に身を任せて
+06:45 不安を掛けないで 割って 突き抜けろ
+06:51 張り詰めた身体が踊っている
+06:56 綺麗な花もいいけど
+06:59 傷をも誇れる花になろう
+07:05 (Whoa, whoa-oh-oh, whoa)
+07:15 良い人なんかじゃないよ
+07:17 怪我をした心は痛いよ
+07:20 神様は何をしているの？観ているの？
+07:25 いつか おとぎ話のように
+07:30 綺麗になってしまうのかな
+07:33 血と汗が ただ
+07:40 ♪ (Instrumental)
+08:00 ゴールテープを探そう
+08:05 輪になって語ろう
+08:10 本当に我々は 遠回りする生き物
+08:21 嫌気がさすよ 共々
+08:26 灰になって空を舞おう
+08:31 本当に神々は 私たちを試している
+08:42 ♪ (Instrumental)
+08:49 試している
+08:53 ♪ (Instrumental)
+09:05 いつの日にか あの朝も 消えるんだろうか
+09:09 その時が来るまでは
+09:13 綺麗な花もいいけど
+09:17 傷をも誇れる花になろう
+09:21 愛に満ちたこの日々に 何を残そう
+09:27 そう 今こそ 生まれてきた意味を刻む時だ`;
+
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            videoId: VIDEO_ID,
+            playerVars: { 'playsinline': 1 }
+        });
+    }
+
+    function jumpTo(seconds) {
+        if (player && player.seekTo) {
+            player.seekTo(seconds, true);
+            player.playVideo();
+        }
+    }
+
+    const listElement = document.getElementById('timestamp-list');
+    rawText.trim().split('\n').forEach(line => {
+        const timeMatch = line.match(/(\d{1,2}:)?(\d{1,2}):(\d{2})/);
+        if (timeMatch) {
+            const timeStr = timeMatch[0];
+            const text = line.replace(timeStr, '').trim();
+            const parts = timeStr.split(':').reverse();
+            let seconds = parseInt(parts[0]) + (parseInt(parts[1]) * 60);
+            if (parts[2]) seconds += (parseInt(parts[2]) * 3600);
+
+            const item = document.createElement('div');
+            item.className = 'timestamp-item';
+            item.innerHTML = `<span class="time-badge">${timeStr}</span><span class="text-content">${text}</span>`;
+            item.onclick = () => jumpTo(seconds);
+            listElement.appendChild(item);
+        }
+    });
+</script>
+</body>
+</html>
