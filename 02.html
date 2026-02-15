@@ -73,18 +73,34 @@
     const items = [];
 
     // リストの生成
+    // リストの生成（この部分を01, 02共通で差し替え）
     data.forEach(([timeStr, text, memo]) => {
         const parts = timeStr.split(':').reverse();
         let seconds = parseInt(parts[0]) + (parseInt(parts[1]) * 60);
+        if (parts[2]) seconds += (parseInt(parts[2]) * 3600);
 
         const item = document.createElement('div');
         item.className = 'timestamp-item';
+        
+        // --- 修正：HTML構造を「メイン行」と「メモ行」に分ける ---
         item.innerHTML = `
-            <span class="time-badge">${timeStr}</span>
-            <span class="text-content">${text}</span>
-            <span class="memo-content">${memo}</span>
+            <div class="item-main">
+                <span class="time-badge">${timeStr}</span>
+                <span class="text-content">${text}</span>
+            </div>
+            <div class="memo-content">${memo}</div>
         `;
-        item.onclick = () => { video.currentTime = seconds; video.play(); };
+        
+        item.onclick = () => {
+            // YouTube(01)の場合は player.seekTo、Cloudinary(02)の場合は video.currentTime
+            if (typeof player !== 'undefined' && player.seekTo) {
+                player.seekTo(seconds, true);
+                player.playVideo();
+            } else {
+                video.currentTime = seconds;
+                video.play();
+            }
+        };
         listElement.appendChild(item);
         items.push({ seconds, element: item });
     });
