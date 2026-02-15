@@ -2,35 +2,139 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>歌詞データ変換器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一括変換ツール (admin1)</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        textarea { width: 100%; height: 200px; margin-bottom: 10px; }
-        pre { background: #eee; padding: 10px; white-space: pre-wrap; }
+        /* admin専用の追加調整 */
+        .admin-box {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #000;
+            font-family: monospace;
+            box-sizing: border-box;
+            background: #fdfdfd;
+        }
+        .convert-btn {
+            background: #000;
+            color: #fff;
+            padding: 10px 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: 0.3s;
+            display: block;
+            width: 100%;
+        }
+        .convert-btn:hover {
+            background: #333;
+        }
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9em;
+            border: 1px solid #000;
+            display: none; /* 初期は非表示 */
+        }
+        .desc {
+            font-size: 0.9em;
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>歌詞データ変換ツール</h1>
-    <p>歌詞（00:12 歌詞 の形式）を貼り付けて変換ボタンを押してください</p>
-    <textarea id="inputText" placeholder="00:12 ここに歌詞"></textarea>
-    <button onclick="convert()">変換する</button>
 
-    <h2>変換結果（これをコピーしてHTMLに貼るだけ！）</h2>
-    <pre id="result"></pre>
+<div class="home-wrapper">
+    <h1>一括変換ツール (admin1)</h1>
 
-    <script>
-        function convert() {
-            const input = document.getElementById('inputText').value;
-            const lines = input.trim().split('\n');
-            const result = lines.map(line => {
-                const match = line.match(/(\d{2}:\d{2})\s+(.*)/);
-                if (match) {
-                    return `        ["${match[1]}", "${match[2]}", ""],`;
-                }
-                return null;
-            }).filter(x => x).join('\n');
+    <div class="admin-box">
+        <div class="desc">
+            <strong>使い方：</strong><br>
+            ・「00:12 歌詞テキスト」の形式、または <strong>SRTファイル</strong> の中身をそのまま貼り付けてください。<br>
+            ・変換後に出力されたコードを、各曲のHTML（myData部分）に貼り付ければ完了です。
+        </div>
 
-            document.getElementById('result').textContent = `[\n${result}\n]`;
+        <textarea id="inputText" placeholder="00:12 ここに歌詞を入力
+または
+SRTファイルの中身をペースト"></textarea>
+        
+        <button class="convert-btn" onclick="convert()">コードを生成する</button>
+
+        <h2 id="resultTitle" style="display:none; font-size:1.2em; margin-top:30px;">変換結果（コピー用）</h2>
+        <pre id="result"></pre>
+    </div>
+
+    <a href="index.html" class="back-link">← データベースに戻る</a>
+</div>
+
+<script>
+    function convert() {
+        const input = document.getElementById('inputText').value.trim();
+        if (!input) {
+            alert("歌詞を入力してください");
+            return;
         }
-    </script>
+
+        let resultArray = [];
+
+        // SRT形式（--> が含まれているか）の判定
+        if (input.includes('-->')) {
+            const blocks = input.split(/\n\s*\n/);
+            blocks.forEach(block => {
+                const lines = block.split('\n');
+                // 時間行 (00:00:12,000 --> 00:00:15,000) から MM:SS を抽出
+                const timeMatch = block.match(/(\d{2}):(\d{2}):(\d{2})/);
+                if (timeMatch) {
+                    const timeStr = `${timeMatch[2]}:${timeMatch[3]}`;
+                    // 3行目以降が歌詞テキスト
+                    const text = lines.slice(2).join(' ').trim();
+                    if (text && text !== '♪') {
+                        resultArray.push(`        ["${timeStr}", "${text}", ""]`);
+                    }
+                }
+            });
+        } else {
+            // 通常の 00:00 歌詞 形式
+            const lines = input.split('\n');
+            lines.forEach(line => {
+                const match = line.match(/(\d{1,2}:\d{2})\s+(.*)/);
+                if (match) {
+                    resultArray.push(`        ["${match[1]}", "${match[2]}", ""]`);
+                }
+            });
+        }
+
+        if (resultArray.length > 0) {
+            const output = document.getElementById('result');
+            const title = document.getElementById('resultTitle');
+            
+            output.textContent = `const myData = [\n${resultArray.join(',\n')}\n];`;
+            output.style.display = "block";
+            title.style.display = "block";
+            
+            // 画面を下にスクロール
+            output.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert("形式が正しく読み取れませんでした。");
+        }
+    }
+</script>
+
 </body>
 </html>
