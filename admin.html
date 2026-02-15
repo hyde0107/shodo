@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>歌詞データ変換器</title>
+    <style>
+        textarea { width: 100%; height: 200px; margin-bottom: 10px; }
+        pre { background: #eee; padding: 10px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>歌詞データ変換ツール</h1>
+    <p>歌詞（00:12 歌詞 の形式）を貼り付けて変換ボタンを押してください</p>
+    <textarea id="inputText" placeholder="00:12 ここに歌詞"></textarea>
+    <button onclick="convert()">変換する</button>
+
+    <h2>変換結果（これをコピーしてHTMLに貼るだけ！）</h2>
+    <pre id="result"></pre>
+
+    <script>
+        function convert() {
+            const input = document.getElementById('inputText').value;
+            const lines = input.trim().split('\n');
+            const result = lines.map(line => {
+                const match = line.match(/(\d{2}:\d{2})\s+(.*)/);
+                if (match) {
+                    return `        ["${match[1]}", "${match[2]}", ""],`;
+                }
+                return null;
+            }).filter(x => x).join('\n');
+
+            document.getElementById('result').textContent = `[\n${result}\n]`;
+        }
+    </script>
+</body>
+</html>
