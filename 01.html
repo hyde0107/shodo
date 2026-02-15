@@ -6,18 +6,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>01 2026公民館</h1>
-    <div class="app-container">
-        <div class="player-section"><div id="player" class="video-container"></div></div>
-        <div class="list-section" id="timestamp-list"></div>
+    <div class="page-wrapper">
+        <h1>01 2026公民館</h1>
+        <div class="app-container">
+            <div class="player-section"><div id="player" class="video-container"></div></div>
+            <div class="list-section" id="timestamp-list"></div>
+        </div>
+        <a href="index.html" class="btn back-link">← 戻る</a>
     </div>
-    <a href="index.html" class="back-link">← 戻る</a>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
     <script>
         const myData = [
-             ["00:00", "一番きれいな色ってなんだろう？", ""],
+        ["00:00", "一番きれいな色ってなんだろう？", ""],
         ["00:07", "一番ひかってるものってなんだろう？", ""],
         ["00:13", "僕は探していた 最高のGIFTを", ""],
         ["00:20", "君が喜んだ姿をイメージしながら", ""],
@@ -117,6 +119,7 @@
             player = new YT.Player('player', {
                 videoId: 'lN17WxlwdTY',
                 events: { 'onReady': () => {
+                    window.player = player;
                     app = initApp(myData, null);
                     setInterval(() => app.updateHighlight(player.getCurrentTime()), 500);
                 }}
