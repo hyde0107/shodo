@@ -152,9 +152,11 @@
         const item = document.createElement('div');
         item.className = 'timestamp-item';
         item.innerHTML = `
-            <span class="time-badge">${timeStr}</span>
-            <span class="text-content">${text}</span>
-            <span class="memo-content">${memo}</span>
+            <div class="item-main">
+                <span class="time-badge">${timeStr}</span>
+                <span class="text-content">${text}</span>
+            </div>
+            <div class="memo-content">${memo}</div>
         `;
         item.onclick = () => {
             if (player && player.seekTo) {
