@@ -2,33 +2,25 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>02 2026三送会</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<h1>02 2026三送会</h1>
-
-<div class="app-container">
-    <div class="player-section">
-        <video id="video-player" controls playsinline class="video-container" style="background:#000; width:100%; aspect-ratio:16/9;">
-            <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
-        </video>
+    <h1>02 2026三送会</h1>
+    <div class="app-container">
+        <div class="player-section">
+            <video id="video-player" controls playsinline class="video-container">
+                <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="list-section" id="timestamp-list"></div>
     </div>
-    <div class="list-section" id="timestamp-list"></div>
-</div>
+    <a href="index.html" class="back-link">← 戻る</a>
 
-<a href="index.html" class="back-link">← データベースに戻る</a>
-
-<script>
-    const video = document.getElementById('video-player');
-    const listElement = document.getElementById('timestamp-list');
-
-    // タイムスタンプと歌詞、そして「メモ」のデータ
-    // 2番目のカンマの後に文字を入れると、画面右側に指示が表示されます
-    const data = [
-        ["00:00", "", "人入場、さき、あん、めくる"],
+    <script src="script.js"></script>
+    <script>
+        const myData = [
+             ["00:00", "", "人入場、さき、あん、めくる"],
         ["00:18", "握りしめた手が何か言う", "ひな、さき、あん、ひで、書く"],
         ["00:24", "駆けだせば間に合うさと", ""],
         ["00:29", "コンビニで雑誌 立ち読みしてた", ""],
@@ -68,59 +60,9 @@
         ["03:44", "芽生えた 名もなき夢たち", ""],
         ["03:50", "振り向くな 後ろには明日はないから", ""],
         ["03:57", "前へ 前へ", "板撤退"]
-    ];
-
-    const items = [];
-
-    // リストの生成
-    // リストの生成（この部分を01, 02共通で差し替え）
-    data.forEach(([timeStr, text, memo]) => {
-        const parts = timeStr.split(':').reverse();
-        let seconds = parseInt(parts[0]) + (parseInt(parts[1]) * 60);
-        if (parts[2]) seconds += (parseInt(parts[2]) * 3600);
-
-        const item = document.createElement('div');
-        item.className = 'timestamp-item';
-        
-        // --- 修正：HTML構造を「メイン行」と「メモ行」に分ける ---
-        item.innerHTML = `
-            <div class="item-main">
-                <span class="time-badge">${timeStr}</span>
-                <span class="text-content">${text}</span>
-            </div>
-            <div class="memo-content">${memo}</div>
-        `;
-        
-        item.onclick = () => {
-            // YouTube(01)の場合は player.seekTo、Cloudinary(02)の場合は video.currentTime
-            if (typeof player !== 'undefined' && player.seekTo) {
-                player.seekTo(seconds, true);
-                player.playVideo();
-            } else {
-                video.currentTime = seconds;
-                video.play();
-            }
-        };
-        listElement.appendChild(item);
-        items.push({ seconds, element: item });
-    });
-
-    // 1. 自動スクロール機能の実装
-    video.addEventListener('timeupdate', () => {
-        const currentTime = video.currentTime;
-        items.forEach((item, index) => {
-            const nextItem = items[index + 1];
-            const isPlaying = currentTime >= item.seconds && (!nextItem || currentTime < nextItem.seconds);
-            
-            if (isPlaying) {
-                item.element.classList.add('playing');
-                // 中央にスクロール
-                item.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                item.element.classList.remove('playing');
-            }
-        });
-    });
-</script>
+        ];
+        // アプリを起動
+        initApp(myData, 'video-player');
+    </script>
 </body>
 </html>
