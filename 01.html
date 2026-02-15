@@ -3,22 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>01公民館</title>
-    <style>
-        body { font-family: sans-serif; background: #f9f9f9; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .container { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1000px; width: 100%; }
-        .player-section { flex: 1.2; min-width: 320px; position: sticky; top: 20px; height: fit-content; }
-        .list-section { flex: 0.8; min-width: 320px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
-        .video-container { width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; }
-        .timestamp-item { display: flex; align-items: flex-start; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .timestamp-item:hover { background: #f0f0f0; }
-        .time-badge { background: #ff0000; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; margin-right: 12px; font-family: monospace; flex-shrink: 0; }
-        .text-content { font-size: 0.9em; line-height: 1.4; }
-    </style>
+    <title>01 公民館演武 - 解析</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1 style="font-size: 1.2em;">公民館</h1>
+<h1>01 公民館演武</h1>
 
 <div class="container">
     <div class="player-section">
@@ -27,8 +17,10 @@
     <div class="list-section" id="timestamp-list"></div>
 </div>
 
+<a href="index.html" class="back-link">← データベースに戻る</a>
+
 <script>
-    const VIDEO_ID = 'lN17WxlwdTY'; // YouTube動画ID
+    const VIDEO_ID = 'lN17WxlwdTY'; 
     const rawText = `00:00 一番きれいな色ってなんだろう？
 00:07 一番ひかってるものってなんだろう？
 00:13 僕は探していた 最高のGIFTを
