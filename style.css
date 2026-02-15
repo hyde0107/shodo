@@ -124,3 +124,60 @@ h1 {
     border: 1px solid #000;
     padding: 8px 20px;
 }
+/* --- 自動スクロール・メモ・スマホ最適化 --- */
+
+/* リストアイテムの基本形 */
+.timestamp-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+    cursor: pointer;
+}
+
+/* 今再生されている行のハイライト */
+.timestamp-item.playing {
+    background: #eef6ff;
+    border-left: 4px solid #007bff;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* 特記事項メモ欄のスタイル */
+.memo-content {
+    flex: 1;
+    text-align: right;
+    font-size: 0.85rem;
+    color: #d9534f; /* 警告色（赤系）で目立たせる */
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+/* タイムバッジの微調整 */
+.time-badge {
+    background: #666;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 0.8rem;
+}
+
+/* 横向き（スマホ横持ち）時の最適化 */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .app-container {
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+    }
+    .player-section {
+        flex: 2;
+    }
+    .list-section {
+        flex: 1;
+        overflow-y: scroll;
+    }
+    h1 { display: none; } /* 画面を広く使うためタイトルを隠す */
+}
