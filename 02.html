@@ -6,21 +6,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>02 2026三送会</h1>
-    <div class="app-container">
-        <div class="player-section">
-            <video id="video-player" controls playsinline class="video-container">
-                <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
-            </video>
+    <div class="page-wrapper">
+        <h1>02 2026三送会</h1>
+        <div class="app-container">
+            <div class="player-section">
+                <video id="video-player" controls playsinline class="video-container">
+                    <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="list-section" id="timestamp-list"></div>
         </div>
-        <div class="list-section" id="timestamp-list"></div>
+        <a href="index.html" class="btn back-link">← 戻る</a>
     </div>
-    <a href="index.html" class="back-link">← 戻る</a>
 
     <script src="script.js"></script>
     <script>
         const myData = [
-             ["00:00", "", "人入場、さき、あん、めくる"],
+        ["00:00", "", "人入場、さき、あん、めくる"],
         ["00:18", "握りしめた手が何か言う", "ひな、さき、あん、ひで、書く"],
         ["00:24", "駆けだせば間に合うさと", ""],
         ["00:29", "コンビニで雑誌 立ち読みしてた", ""],
@@ -61,7 +63,6 @@
         ["03:50", "振り向くな 後ろには明日はないから", ""],
         ["03:57", "前へ 前へ", "板撤退"]
         ];
-        // アプリを起動
         initApp(myData, 'video-player');
     </script>
 </body>
