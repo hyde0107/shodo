@@ -162,3 +162,40 @@ h1 {
     .list-section { flex: 1; overflow-y: scroll; }
     h1 { display: none; }
 }
+/* ページ下部の管理者エリア */
+.admin-footer {
+    margin-top: 100px; /* カードから十分な距離をとる */
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.admin-footer p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.admin-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.admin-link {
+    font-size: 0.85em;
+    text-decoration: none;
+    color: #333;
+    background: #fff;
+    border: 1px solid #000;
+    padding: 10px 20px;
+    transition: 0.2s;
+}
+
+.admin-link:hover {
+    background: #000;
+    color: #fff;
+}
