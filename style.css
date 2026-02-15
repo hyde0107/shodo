@@ -1,13 +1,18 @@
-/* 共通設定、h1、カードデザインなどは変更なし（そのまま維持） */
+/* --- 共通設定 --- */
 body { 
     font-family: "Hiragino Mincho ProN", serif; 
     background: #e8e4df; 
     color: #000; 
     margin: 0; 
-    padding: 20px;
+    padding: 0; /* paddingを解除 */
+}
+
+/* ホーム画面（index.html）用のコンテナ */
+.home-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 40px 20px;
 }
 
 h1 {
@@ -16,114 +21,110 @@ h1 {
     display: inline-block;
     margin-bottom: 40px;
     padding: 0 20px 10px;
-    max-width: 1000px;
+    text-align: center;
 }
 
-/* 解析ページ用：プレイヤーとリスト */
+/* --- カードデザイン (Home) --- */
+.container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #000;
+    width: 280px;
+    padding: 30px;
+    text-decoration: none;
+    color: #000;
+    transition: 0.3s;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.card:hover {
+    background: #f0f0f0;
+    transform: translateY(-5px);
+    box-shadow: 10px 10px 0 #000;
+}
+
+.card h2 {
+    font-size: 1.4em;
+    margin: 0 0 15px;
+    border-left: 5px solid #000;
+    padding-left: 10px;
+}
+
+.hanko {
+    border: 2px solid #a40000;
+    color: #a40000;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8em;
+    margin: 20px 0 0 auto;
+    transform: rotate(-5deg);
+}
+
+/* --- 解析ページ (01, 02.html) 用レイアウト --- */
 .app-container { 
     display: flex; 
     flex-wrap: wrap; 
-    gap: 20px; 
-    max-width: 1000px; 
+    gap: 0; /* 隙間を詰める */
     width: 100%; 
+    height: calc(100vh - 80px); /* 画面いっぱいに使う */
 }
 
-.player-section { 
-    flex: 1.2; 
-    min-width: 320px; 
-}
-
-.video-container { 
-    width: 100%; 
-    aspect-ratio: 16 / 9; 
-    background: #000; 
-    border: 1px solid #000; 
-}
+.player-section { flex: 1.4; min-width: 320px; background: #000; }
+.video-container { width: 100%; height: 100%; object-fit: contain; }
 
 .list-section { 
-    flex: 0.8; 
+    flex: 0.6; 
     min-width: 320px; 
     background: #fff; 
-    padding: 0; /* paddingを一旦0に */
-    border: 1px solid #000; 
-    max-height: 80vh; 
+    border-left: 1px solid #000;
     overflow-y: auto; 
 }
 
-/* --- 改良：縦並びのリストアイテム --- */
+/* 縦並びのアイテム */
 .timestamp-item { 
     display: flex; 
-    flex-direction: column; /* 縦に並べる（歌詞→メモ） */
-    padding: 12px 15px; 
+    flex-direction: column; 
+    padding: 15px; 
     border-bottom: 1px solid #eee; 
     cursor: pointer;
-    transition: all 0.2s;
+    transition: 0.2s;
     border-left: 5px solid transparent;
 }
 
-.timestamp-item:hover { 
-    background: #f9f9f9;
-}
+.timestamp-item:hover { background: #f5f5f5; }
+.timestamp-item.playing { background: #f0f4f8; border-left: 5px solid #007bff; }
 
-/* 今再生されている行のハイライト（和風な濃紺に変更） */
-.timestamp-item.playing {
-    background: #f0f4f8;
-    border-left: 5px solid #1a237e;
-}
+.item-main { display: flex; align-items: center; gap: 10px; }
+.time-badge { background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; border-radius: 4px; flex-shrink: 0; }
+.text-content { font-size: 1.05rem; color: #000; }
+.playing .text-content { font-weight: bold; color: #007bff; }
 
-/* 歌詞（時間＋テキスト）の行 */
-.item-main {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.time-badge { 
-    background: #333; 
-    color: #fff; 
-    padding: 2px 8px; 
-    font-size: 0.8em; 
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.text-content {
-    font-size: 1rem;
-    color: #000;
-    line-height: 1.4;
-}
-
-.playing .text-content {
-    font-weight: bold;
-    color: #1a237e; /* 再生中は少し色を変える */
-}
-
-/* ★追加ノート（メモ）を歌詞の下に配置 */
 .memo-content {
-    margin-top: 6px;
-    margin-left: 58px; /* 時間バッジの幅分インデント */
-    font-size: 0.85rem;
-    color: #a40000; /* ハンコと同じ赤色で目立たせる */
+    margin-top: 8px;
+    margin-left: 52px;
+    font-size: 0.9rem;
+    color: #a40000;
     font-weight: bold;
 }
 
-/* メモが空のときは余白を作らない */
-.memo-content:empty {
-    display: none;
-}
+.back-link-container { padding: 20px; text-align: center; background: #fff; border-top: 1px solid #000; }
+.back-link { text-decoration: none; color: #000; border: 1px solid #000; padding: 8px 20px; font-weight: bold; }
 
-.back-link {
-    margin-top: 30px;
-    text-decoration: none;
-    color: #000;
-    border: 1px solid #000;
-    padding: 8px 20px;
-}
-
-/* 横向き（スマホ横持ち）時の最適化 */
+/* スマホ横向き */
 @media screen and (orientation: landscape) and (max-height: 500px) {
-    .app-container { flex-direction: row; height: 100vh; }
-    .player-section { flex: 1.5; }
-    .list-section { flex: 1; }
+    .app-container { height: 100vh; }
     h1 { display: none; }
 }
