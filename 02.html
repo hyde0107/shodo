@@ -8,11 +8,11 @@
 </head>
 <body>
 
-<h1>02 2026三送会</h1>
+<h1>02 2026三送会 (サクラ咲ケ)</h1>
 
 <div class="app-container">
     <div class="player-section">
-        <video id="video-player" controls playsinline class="video-container"></video>
+        <video id="video-player" controls playsinline class="video-container" style="background:#000; border:1px solid #000; width:100%; aspect-ratio:16/9;"></video>
     </div>
     <div class="list-section" id="timestamp-list"></div>
 </div>
@@ -20,13 +20,13 @@
 <a href="index.html" class="back-link">← データベースに戻る</a>
 
 <script>
-    // 直接再生用リンクに変換済みのURL
+    // 指定されたGoogleドライブの直接再生用URL
     const VIDEO_SRC = 'https://drive.google.com/uc?export=download&id=13DbmG48MHpG8S_DnpKe5AIg2RPljC6fV';
 
     const video = document.getElementById('video-player');
     video.src = VIDEO_SRC;
 
-    // タイムスタンプデータ（ここを編集して中身を増やせます）
+    // SRTファイルから抽出した「サクラ咲ケ」のタイムスタンプ
     const rawText = `00:16 握りしめた手が何か言う
 00:22 駆けだせば間に合うさと
 00:27 コンビニで雑誌 立ち読みしてた
