@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>02 2026三送会 - 解析</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>02 2026三送会</h1>
+
+<div class="app-container">
+    <div class="player-section">
+        <video id="video-player" controls playsinline class="video-container"></video>
+    </div>
+    <div class="list-section" id="timestamp-list"></div>
+</div>
+
+<a href="index.html" class="back-link">← データベースに戻る</a>
+
+<script>
+    // 直接再生用リンクに変換済みのURL
+    const VIDEO_SRC = 'https://drive.google.com/uc?export=download&id=13DbmG48MHpG8S_DnpKe5AIg2RPljC6fV';
+
+    const video = document.getElementById('video-player');
+    video.src = VIDEO_SRC;
+
+    // タイムスタンプデータ（ここを編集して中身を増やせます）
+    const rawText = `00:00 開始
+00:10 イントロ
+00:30 三年生へのメッセージ開始
+01:00 演武本番
+02:00 フィナーレ`;
+
+    function jumpTo(seconds) {
+        video.currentTime = seconds;
+        video.play();
+    }
+
+    const listElement = document.getElementById('timestamp-list');
+    rawText.trim().split('\n').forEach(line => {
+        const timeMatch = line.match(/(\d{1,2}:)?(\d{1,2}):(\d{2})/);
+        if (timeMatch) {
+            const timeStr = timeMatch[0];
+            const text = line.replace(timeStr, '').trim();
+            const parts = timeStr.split(':').reverse();
+            let seconds = parseInt(parts[0]) + (parseInt(parts[1]) * 60);
+            if (parts[2]) seconds += (parseInt(parts[2]) * 3600);
+
+            const item = document.createElement('div');
+            item.className = 'timestamp-item';
+            item.innerHTML = `<span class="time-badge">${timeStr}</span><span class="text-content">${text}</span>`;
+            item.onclick = () => jumpTo(seconds);
+            listElement.appendChild(item);
+        }
+    });
+</script>
+</body>
+</html>
