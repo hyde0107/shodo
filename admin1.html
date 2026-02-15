@@ -2,110 +2,48 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一括変換ツール (admin1)</title>
+    <title>一括変換ツール</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* admin専用のレイアウト調整 */
-        .admin-box {
-            background: #fff;
-            border: 1px solid #000;
-            padding: 30px;
-            max-width: 900px;
-            width: 100%;
-            box-sizing: border-box;
-            display: flex;         /* 箱の中も縦に並べる */
-            flex-direction: column;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 250px;
-            margin: 15px 0;
-            padding: 10px;
-            border: 1px solid #000;
-            font-family: monospace;
-            box-sizing: border-box;
-        }
-
-        .convert-btn {
-            background: #000;
-            color: #fff;
-            padding: 12px;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1em;
-            width: 100%;
-            margin-bottom: 20px; /* 下の要素との距離 */
-        }
-
-        pre {
-            background: #333;
-            color: #fff;
-            padding: 20px;
-            white-space: pre-wrap;
-            display: none;
-            border: 1px solid #000;
-        }
-
-        /* 戻るボタンが干渉しないように専用の場所を作る */
-        .footer-nav {
-            margin-top: 40px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-    </style>
 </head>
 <body>
-
-<div class="home-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <h1>一括変換ツール (admin1)</h1>
-
-    <div class="admin-box">
-        <p class="desc">SRTファイルや歌詞テキストを貼り付けてください</p>
-        <textarea id="inputText" placeholder="00:12 歌詞を入力"></textarea>
-        
-        <button class="convert-btn" onclick="convert()">コードを生成する</button>
-
-        <pre id="result"></pre>
+    <div class="page-wrapper">
+        <h1>一括変換ツール</h1>
+        <div class="admin-box">
+            <p>SRTファイルや歌詞テキストを貼り付けてください</p>
+            <textarea id="inputText" placeholder="01:20 歌詞のように入力"></textarea>
+            <button class="btn btn-red" style="width:100%" onclick="convert()">コードを生成する</button>
+            <pre id="result"></pre>
+        </div>
+        <a href="index.html" class="btn back-link">← 戻る</a>
     </div>
 
-    <div class="footer-nav">
-        <a href="index.html" class="back-link">← データベースに戻る</a>
-    </div>
-</div>
-
-<script>
-    function convert() {
-        const input = document.getElementById('inputText').value.trim();
-        if (!input) return;
-
-        let resultArray = [];
-        if (input.includes('-->')) {
-            const blocks = input.split(/\n\s*\n/);
-            blocks.forEach(block => {
-                const lines = block.split('\n');
-                const timeMatch = block.match(/(\d{2}):(\d{2}):(\d{2})/);
-                if (timeMatch) {
-                    const timeStr = `${timeMatch[2]}:${timeMatch[3]}`;
-                    const text = lines.slice(2).join(' ').trim();
-                    if (text && text !== '♪') resultArray.push(`        ["${timeStr}", "${text}", ""]`);
-                }
-            });
-        } else {
-            const lines = input.split('\n');
-            lines.forEach(line => {
-                const match = line.match(/(\d{1,2}:\d{2})\s+(.*)/);
-                if (match) resultArray.push(`        ["${match[1]}", "${match[2]}", ""]`);
-            });
+    <script>
+        function convert() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) return;
+            let resultArray = [];
+            if (input.includes('-->')) { // SRT形式
+                const blocks = input.split(/\n\s*\n/);
+                blocks.forEach(block => {
+                    const lines = block.split('\n');
+                    const timeMatch = block.match(/(\d{2}):(\d{2}):(\d{2})/);
+                    if (timeMatch) {
+                        const timeStr = `${timeMatch[2]}:${timeMatch[3]}`;
+                        const text = lines.slice(2).join(' ').trim();
+                        if (text && text !== '♪') resultArray.push(`  ["${timeStr}", "${text}", ""]`);
+                    }
+                });
+            } else { // 自由形式
+                const lines = input.split('\n');
+                lines.forEach(line => {
+                    const match = line.match(/(\d{1,2}:\d{2})\s+(.*)/);
+                    if (match) resultArray.push(`  ["${match[1]}", "${match[2]}", ""]`);
+                });
+            }
+            const output = document.getElementById('result');
+            output.textContent = `const myData = [\n${resultArray.join(',\n')}\n];`;
+            output.style.display = "block";
         }
-
-        const output = document.getElementById('result');
-        output.textContent = `const myData = [\n${resultArray.join(',\n')}\n];`;
-        output.style.display = "block";
-    }
-</script>
-
+    </script>
 </body>
 </html>
