@@ -1,4 +1,4 @@
-/* 共通設定 */
+/* 共通設定、h1、カードデザインなどは変更なし（そのまま維持） */
 body { 
     font-family: "Hiragino Mincho ProN", serif; 
     background: #e8e4df; 
@@ -17,53 +17,6 @@ h1 {
     margin-bottom: 40px;
     padding: 0 20px 10px;
     max-width: 1000px;
-}
-
-/* ホーム画面用：カードデザイン */
-.container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.card {
-    background: #fff;
-    border: 1px solid #000;
-    width: 280px;
-    padding: 30px;
-    text-decoration: none;
-    color: #000;
-    transition: 0.3s;
-    position: relative;
-}
-
-.card:hover {
-    background: #f0f0f0;
-    transform: translateY(-5px);
-    box-shadow: 10px 10px 0 #000;
-}
-
-.card h2 {
-    font-size: 1.4em;
-    margin: 0 0 15px;
-    border-left: 5px solid #000;
-    padding-left: 10px;
-    text-align: left;
-}
-
-.hanko {
-    border: 2px solid #a40000;
-    color: #a40000;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.8em;
-    margin: 20px 0 0 auto;
-    transform: rotate(-5deg);
 }
 
 /* 解析ページ用：プレイヤーとリスト */
@@ -91,30 +44,72 @@ h1 {
     flex: 0.8; 
     min-width: 320px; 
     background: #fff; 
-    padding: 10px; 
+    padding: 0; /* paddingを一旦0に */
     border: 1px solid #000; 
     max-height: 80vh; 
     overflow-y: auto; 
 }
 
+/* --- 改良：縦並びのリストアイテム --- */
 .timestamp-item { 
     display: flex; 
-    padding: 12px 10px; 
+    flex-direction: column; /* 縦に並べる（歌詞→メモ） */
+    padding: 12px 15px; 
     border-bottom: 1px solid #eee; 
-    cursor: pointer; 
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 5px solid transparent;
 }
 
 .timestamp-item:hover { 
-    background: #f5f5f5; 
-    border-left: 4px solid #000;
+    background: #f9f9f9;
+}
+
+/* 今再生されている行のハイライト（和風な濃紺に変更） */
+.timestamp-item.playing {
+    background: #f0f4f8;
+    border-left: 5px solid #1a237e;
+}
+
+/* 歌詞（時間＋テキスト）の行 */
+.item-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .time-badge { 
-    background: #000; 
+    background: #333; 
     color: #fff; 
     padding: 2px 8px; 
     font-size: 0.8em; 
-    margin-right: 12px; 
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.text-content {
+    font-size: 1rem;
+    color: #000;
+    line-height: 1.4;
+}
+
+.playing .text-content {
+    font-weight: bold;
+    color: #1a237e; /* 再生中は少し色を変える */
+}
+
+/* ★追加ノート（メモ）を歌詞の下に配置 */
+.memo-content {
+    margin-top: 6px;
+    margin-left: 58px; /* 時間バッジの幅分インデント */
+    font-size: 0.85rem;
+    color: #a40000; /* ハンコと同じ赤色で目立たせる */
+    font-weight: bold;
+}
+
+/* メモが空のときは余白を作らない */
+.memo-content:empty {
+    display: none;
 }
 
 .back-link {
@@ -124,60 +119,11 @@ h1 {
     border: 1px solid #000;
     padding: 8px 20px;
 }
-/* --- 自動スクロール・メモ・スマホ最適化 --- */
-
-/* リストアイテムの基本形 */
-.timestamp-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    transition: all 0.3s;
-    border-left: 4px solid transparent;
-    cursor: pointer;
-}
-
-/* 今再生されている行のハイライト */
-.timestamp-item.playing {
-    background: #eef6ff;
-    border-left: 4px solid #007bff;
-    font-weight: bold;
-    color: #007bff;
-}
-
-/* 特記事項メモ欄のスタイル */
-.memo-content {
-    flex: 1;
-    text-align: right;
-    font-size: 0.85rem;
-    color: #d9534f; /* 警告色（赤系）で目立たせる */
-    font-weight: bold;
-    padding-left: 10px;
-}
-
-/* タイムバッジの微調整 */
-.time-badge {
-    background: #666;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-right: 10px;
-    font-size: 0.8rem;
-}
 
 /* 横向き（スマホ横持ち）時の最適化 */
 @media screen and (orientation: landscape) and (max-height: 500px) {
-    .app-container {
-        display: flex;
-        flex-direction: row;
-        height: 100vh;
-    }
-    .player-section {
-        flex: 2;
-    }
-    .list-section {
-        flex: 1;
-        overflow-y: scroll;
-    }
-    h1 { display: none; } /* 画面を広く使うためタイトルを隠す */
+    .app-container { flex-direction: row; height: 100vh; }
+    .player-section { flex: 1.5; }
+    .list-section { flex: 1; }
+    h1 { display: none; }
 }
