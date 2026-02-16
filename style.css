@@ -99,3 +99,19 @@ pre#result, #output {
 /* 管理者用フッター */
 .admin-footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid #ccc; width: 100%; text-align: center; }
 .admin-footer p { font-size: 0.9em; color: #666; }
+
+/* メモの内容に応じた色分け */
+.memo-type-1 { color: #d9534f; } /* 赤系：情熱・重要 */
+.memo-type-2 { color: #428bca; } /* 青系：冷静・メロディ */
+.memo-type-3 { color: #5cb85c; } /* 緑系：自然・安らぎ */
+.memo-type-4 { color: #f0ad4e; } /* オレンジ系：光・変化 */
+.memo-type-5 { color: #9966cc; } /* 紫系：神秘・深淵 */
+
+/* 既存の .memo-content から color 指定を削除するか、
+   上記クラスが上書きするように調整してください */
+.memo-content {
+    margin-top: 5px;
+    margin-left: 55px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
