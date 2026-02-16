@@ -106,12 +106,3 @@ pre#result, #output {
 .memo-type-3 { color: #5cb85c; } /* 緑系：自然・安らぎ */
 .memo-type-4 { color: #f0ad4e; } /* オレンジ系：光・変化 */
 .memo-type-5 { color: #9966cc; } /* 紫系：神秘・深淵 */
-
-/* 既存の .memo-content から color 指定を削除するか、
-   上記クラスが上書きするように調整してください */
-.memo-content {
-    margin-top: 5px;
-    margin-left: 55px;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
