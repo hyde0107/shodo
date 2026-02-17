@@ -123,91 +123,105 @@ pre#result, #output {
    モニター画面（01-screen.html）専用スタイル
    ========================================= */
 
-/* --- ここから下を既存の内容と差し替えてください --- */
-
 /* モニター画面の基本設定 */
 body.monitor-body {
-    color: #ffffff !important;     /* 文字色は常に白 */
-    background-color: #000000;     /* デフォルト背景は黒 */
-    height: 100vh;                 /* 高さを画面ピッタリにする */
+    color: #ffffff !important;
+    background-color: #000000;
+    
+    /* スマホのアドレスバー対策：dvhを使うと実表示領域にフィットする */
+    height: 100vh; 
+    height: 100dvh; 
+    
     width: 100vw;
-    overflow: hidden;              /* スクロールバーを完全に隠す */
+    overflow: hidden; /* スクロール完全禁止 */
     margin: 0;
     display: flex;
     flex-direction: column;
 }
 
-/* 開始オーバーレイ（真っ黒背景で画面を覆う） */
-#start-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: #000000; /* 不透明な黒 */
+/* --- メイン表示エリアの調整 --- */
+/* コンテンツがデカすぎて下を押し出さないようにする */
+#monitor-container {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* 最前面 */
+    text-align: center;
+    width: 100%;
+    
+    /* 重要：ここが膨らんでもコントロールバーを押し出さない設定 */
+    min-height: 0; 
+    overflow: hidden; 
+}
+
+/* --- コントロールバーの底上げ --- */
+#controls {
+    /* 固定高さ確保 */
+    height: 140px !important; 
+    flex-shrink: 0; /* 絶対に縮ませない */
+    
+    width: 100%;
+    background: rgba(0,0,0,0.8); /* 背景を濃くして視認性アップ */
+    border-top: 1px solid rgba(255,255,255,0.3);
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1500;
+    
+    /* 下に少し隙間を作って、誤操作防止＆アドレスバー対策 */
+    padding-bottom: 20px; 
+    box-sizing: border-box;
 }
 
 /* 巨大な開始ボタン */
 .big-start-btn {
-    font-size: 4rem; /* とても大きな文字 */
+    font-size: 3rem;
     font-weight: bold;
     color: #000;
     background-color: #fff;
-    padding: 2rem 6rem;
+    padding: 3rem 5rem;
     border-radius: 100px;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(255,255,255,0.5);
+    box-shadow: 0 0 30px rgba(255,255,255,0.8);
     transition: transform 0.1s;
-}
-.big-start-btn:active {
-    transform: scale(0.95); /* 押したときに少し凹む */
+    text-align: center;
+    /* ボタンも少し上に配置 */
+    margin-bottom: 10vh; 
 }
 
-/* 戻るボタン */
+/* --- その他のパーツ（変更なし） --- */
+#start-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #000000; display: flex; justify-content: center; align-items: center; z-index: 9999;
+}
 #back-to-index-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 2000; /* コントロールより上 */
-    color: rgba(255,255,255,0.6);
-    text-decoration: none;
-    font-size: 1.2rem;
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 5px 15px;
-    border-radius: 5px;
-    background: rgba(0,0,0,0.3);
+    position: fixed; top: 20px; left: 20px; z-index: 2000;
+    background-color: #ffffff !important; color: #000000 !important; border: 1px solid #000000 !important;
+    padding: 8px 20px; text-decoration: none; font-size: 0.9em; cursor: pointer;
 }
-#back-to-index-btn:hover {
-    color: #fff;
-    background: rgba(0,0,0,0.7);
+#fullscreen-btn {
+    position: fixed; top: 20px; right: 20px; z-index: 2000;
+    color: rgba(255,255,255,0.6); background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 1.2rem;
 }
 
-/* 背景色の定義（!important で確実に適用させる） */
+/* 背景色設定 */
 .bg-black { background-color: #000000 !important; }
-
-.bg-red    { background-color: #cc0000 !important; }
-.bg-blue   { background-color: #0044cc !important; }
-.bg-green  { background-color: #008800 !important; }
+.bg-red { background-color: #cc0000 !important; }
+.bg-blue { background-color: #0044cc !important; }
+.bg-green { background-color: #008800 !important; }
 .bg-orange { background-color: #dd6600 !important; }
 .bg-purple { background-color: #6600cc !important; }
-
-/* 準備中（少し暗い色 + 点滅） */
-.bg-red-prep    { background-color: #660000 !important; }
-.bg-blue-prep   { background-color: #002244 !important; }
-.bg-green-prep  { background-color: #003300 !important; }
+.bg-red-prep { background-color: #660000 !important; }
+.bg-blue-prep { background-color: #002244 !important; }
+.bg-green-prep { background-color: #003300 !important; }
 .bg-orange-prep { background-color: #663300 !important; }
 .bg-purple-prep { background-color: #2d1a4d !important; }
-
-/* 準備中の点滅アニメーション */
-@keyframes flash-prep { 
-    0%, 100% { opacity: 1; } 
-    50% { opacity: 0.6; } 
-}
-.is-prep { 
-    animation: flash-prep 1.5s infinite; 
-}
-/* --- 以前のコードの末尾に追加してください --- */
+@keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+.is-prep { animation: flash-prep 1.5s infinite; }
 
 /* 全画面切り替えボタン（右上に配置） */
 #fullscreen-btn {
