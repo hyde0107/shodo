@@ -1,26 +1,19 @@
-/**
- * アプリケーションの初期化
- * @param {Array} data - myData（[時間, 歌詞, メモ]）の配列
- * @param {string} videoElementId - 動画要素のID（HTML5 video用、YouTubeの場合はnullでも可）
- */
 function initApp(data, videoElementId) {
     const video = document.getElementById(videoElementId);
     const listElement = document.getElementById('timestamp-list');
     const items = [];
 
-    listElement.innerHTML = ""; // リストの初期化
+    listElement.innerHTML = ""; 
 
     data.forEach(([timeStr, text, memo]) => {
-        // --- 1. 時間（"01:23"）を秒数に変換 ---
         const parts = timeStr.trim().split(':').reverse();
         let seconds = parseInt(parts[0], 10) + (parseInt(parts[1], 10) * 60);
         if (parts[2]) seconds += (parseInt(parts[2], 10) * 3600);
 
-        // --- 2. メモの内容に応じた5色の色分け判定 ---
+        // --- 判定はこれだけでOK ---
         let colorClass = "";
         if (memo) {
             const m = memo.trim();
-            // 修正ポイント：includes("...") の後の ) を追加しました
             if (m.includes("大字")) {
                 colorClass = "memo-color-1"; // 赤
             } else if (m.includes("色")) {
@@ -30,11 +23,10 @@ function initApp(data, videoElementId) {
             } else if (m.includes("スプレー")) {
                 colorClass = "memo-color-4"; // オレンジ
             } else {
-                colorClass = "memo-color-5"; // 紫（その他：人名など）
+                colorClass = "memo-color-5"; // 紫（その他全部）
             }
         }
 
-        // --- 3. HTML要素の生成 ---
         const item = document.createElement('div');
         item.className = 'timestamp-item';
         item.innerHTML = `
@@ -45,7 +37,6 @@ function initApp(data, videoElementId) {
             <div class="memo-content ${colorClass}">${memo || ''}</div>
         `;
         
-        // --- 4. クリックイベント（動画の再生位置移動） ---
         item.onclick = () => {
             if (window.player && window.player.seekTo) {
                 window.player.seekTo(seconds, true);
@@ -60,16 +51,11 @@ function initApp(data, videoElementId) {
         items.push({ seconds, element: item });
     });
 
-    /**
-     * 現在の再生時間に合わせてハイライトと自動スクロールを更新
-     */
     const updateHighlight = (currentTime) => {
         if (currentTime === undefined) return;
-        
         items.forEach((item, index) => {
             const nextItem = items[index + 1];
             const isPlaying = currentTime >= item.seconds && (!nextItem || currentTime < nextItem.seconds);
-            
             if (isPlaying) {
                 if (!item.element.classList.contains('playing')) {
                     items.forEach(i => i.element.classList.remove('playing'));
