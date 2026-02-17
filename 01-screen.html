@@ -3,58 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モニターPro - 統一デザイン版</title>
-    <link rel="stylesheet" href="style.css">
-    
+    <title>モニターPro - 01 公民館</title>
     <style>
-        /* 01-screen.html 独自の上書きスタイル 
-           (文字の視認性に関わる部分はここで微調整)
-        */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* --- 全体のベース --- */
+        body.monitor-body {
+            background-color: #111;
+            color: #fff;
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.5s ease;
+        }
 
-        /* 1. 歌詞ガイド：明朝体で上品に */
+        /* --- 背景色のグラデーション --- */
+        .bg-black { background: radial-gradient(circle at center, #333 0%, #000 100%); }
+        .bg-red   { background: linear-gradient(135deg, #b31217 0%, #570000 100%); }
+        .bg-blue  { background: linear-gradient(135deg, #005bea 0%, #002266 100%); }
+        .bg-green { background: linear-gradient(135deg, #134e5e 0%, #082823 100%); }
+        .bg-orange{ background: linear-gradient(135deg, #ff9966 0%, #cc3300 100%); }
+        .bg-purple{ background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); }
+        .is-prep  { border: 20px solid #ffcc00; }
+
+        /* --- メイン表示エリア --- */
+        #monitor-container {
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        /* 歌詞 */
         #lyrics-guide { 
-            font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+            font-family: "Hiragino Mincho ProN", serif;
             font-size: 3.5vmin;
-            color: rgba(255,255,255,0.7) !important; /* 少し落ち着いた白 */
-            margin-bottom: 1vh;
-            min-height: 1.2em;
-            letter-spacing: 0.05em;
-            flex-shrink: 0;
-        }
-
-        /* 2. アクション指示（READY）：ここは読みやすさ優先でゴシック */
-        #action-label { 
-            font-family: "Hiragino Sans", "Meiryo", sans-serif;
-            font-size: 8vmin;
-            font-weight: bold; 
-            margin-bottom: 0vh;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 2vh;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
             letter-spacing: 0.1em;
-            flex-shrink: 0;
+            min-height: 1.5em;
         }
 
-        /* 3. 名前表示：最重要情報なので極太ゴシック */
-        #name-label { 
-            font-family: "Hiragino Sans", "Meiryo", sans-serif;
-            font-size: 16vmin; 
+        /* アクション名 */
+        #action-label { 
+            display: inline-block;
+            font-size: 6vmin;
             font-weight: 900; 
+            background: rgba(0,0,0,0.3);
+            padding: 0.2em 1em;
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.4);
+            margin-bottom: 2vh;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.1em;
+        }
+
+        /* 名前表示 */
+        #name-label { 
+            display: block;
+            font-size: 14vmin;
+            font-weight: 900;
             line-height: 1.1; 
             white-space: pre-wrap; 
-            text-shadow: 4px 4px 10px rgba(0,0,0,0.8);
-            width: 95%;
-            word-wrap: break-word;
+            text-shadow: 0px 5px 15px rgba(0,0,0,0.8);
+            width: 100%;
+            transition: all 0.3s;
+        }
+        /* 名前が2行になった時 */
+        #name-label.two-lines-mode {
+            font-size: 10vmin !important;
+            line-height: 1.2;
         }
 
-        /* ボタン配置のコンテナ */
-        .btn-row { 
-            display: flex; 
-            gap: 15px; 
-            width: 95%; 
-            max-width: 600px; /* PCで横に伸びすぎないように */
-            justify-content: center; 
+        /* --- UIパーツ --- */
+        #header-controls {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between; z-index: 100;
         }
-        
-        #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
+        #back-to-index-btn, #fullscreen-btn {
+            background: rgba(0,0,0,0.5);
+            color: #fff; border: 1px solid #777;
+            padding: 8px 12px; text-decoration: none; font-size: 14px; border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #controls {
+            position: fixed; bottom: 20px; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            z-index: 100; opacity: 0; transition: opacity 0.3s;
+        }
+        body:hover #controls { opacity: 1; }
+
+        input[type=range] { width: 80%; max-width: 600px; accent-color: #fff; cursor: pointer; }
+        .btn-row { display: flex; gap: 20px; }
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid #fff; color: #fff;
+            padding: 10px 20px; font-size: 16px; border-radius: 30px; cursor: pointer;
+        }
+        .ctrl-btn:active { background: #fff; color: #000; }
+
+        /* 開始オーバーレイ */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 999; cursor: pointer;
+        }
+        .big-start-btn {
+            border: 3px solid #fff; padding: 40px 60px;
+            font-size: 3rem; font-weight: bold; color: #fff;
+            border-radius: 10px; text-align: center;
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+
+        /* YouTubeプレーヤー隠し場所 (透明・操作不可) */
+        #player-wrapper { position: fixed; top:0; left:0; width:1px; height:1px; opacity:0; pointer-events:none; z-index:-1; }
     </style>
 </head>
 <body class="monitor-body bg-black">
@@ -66,33 +136,34 @@
 
     <div id="start-overlay" onclick="startPerformance()">
         <div class="big-start-btn">
-            練習開始<br>
-            <span style="font-size:1.2rem; font-weight:normal; display:block; margin-top:10px;">(画面をタップ)</span>
+            Tap to Start<br>
+            <span style="font-size:1rem; font-weight:normal; display:block; margin-top:15px; opacity:0.7;">練習開始</span>
         </div>
     </div>
 
     <div id="monitor-container">
-        <div id="lyrics-guide"></div>
+        <div id="lyrics-guide">Stand by...</div>
         <span id="action-label">READY</span>
+        <br>
         <span id="name-label">...</span>
     </div>
 
     <div id="controls">
         <input type="range" id="seek-bar" value="0" step="1">
         <div class="btn-row">
-            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
-            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">一時停止</button>
-            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
+            <button class="ctrl-btn" onclick="skip(-5)">-5s</button>
+            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">PAUSE</button>
+            <button class="ctrl-btn" onclick="skip(5)">+5s</button>
         </div>
     </div>
     
     <div id="player-wrapper"><div id="player"></div></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="script.js"></script>
     <script src="data01.js"></script>
 
     <script>
+        // --- 変数定義 ---
         let player;
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
@@ -100,29 +171,49 @@
         const seekBar = document.getElementById('seek-bar');
         const container = document.getElementById('monitor-container');
 
-        const dataSec = performanceData.map(d => ({
-            s: parseTime(d[0]), l: d[1], m: d[2]
-        }));
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                }
-            }
+        // データ読み込みチェック
+        let dataSec = [];
+        // data01.js は performanceData という変数名で定義されている前提
+        if (typeof performanceData === 'undefined') {
+            alert("data01.js が読み込めません！");
+            nameEl.innerText = "DATA ERROR";
+        } else {
+            dataSec = performanceData.map(d => ({
+                s: parseTime(d[0]), l: d[1], m: d[2]
+            }));
         }
 
+        function parseTime(timeStr) {
+            if (!timeStr) return 0;
+            const parts = timeStr.split(':');
+            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+        }
+
+        // --- 色判定ロジック ---
+        function getMemoInfo(memo) {
+            let bgClass = "bg-black";
+            let isPrep = false;
+            if (!memo) return { bgClass, isPrep };
+            
+            if (memo.includes("大字")) bgClass = "bg-red";
+            else if (memo.includes("絵")) bgClass = "bg-blue";
+            else if (memo.includes("めくる")) bgClass = "bg-blue";
+            else if (memo.includes("板")) bgClass = "bg-green";
+            else if (memo.includes("色")) bgClass = "bg-orange";
+            else if (memo.includes("退場")) bgClass = "bg-purple";
+            else if (memo.includes("赤")) bgClass = "bg-red";
+            else if (memo.includes("青")) bgClass = "bg-blue";
+            else if (memo.includes("準備")) {
+                isPrep = true;
+                bgClass = "bg-black";
+            }
+            return { bgClass, isPrep };
+        }
+
+        // --- YouTube API 設定 ---
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                videoId: 'lN17WxlwdTY',
+                videoId: 'lN17WxlwdTY', // 公民館の動画ID
                 playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'playsinline': 1 },
                 events: { 'onReady': onPlayerReady }
             });
@@ -130,40 +221,59 @@
 
         function onPlayerReady() {
             seekBar.max = player.getDuration();
-            setInterval(updateMonitor, 200);
-            seekBar.addEventListener('input', () => player.seekTo(seekBar.value));
+            setInterval(updateMonitor, 100); // 0.1秒ごとに更新
+            
+            // シークバー操作
+            seekBar.addEventListener('input', () => {
+                player.seekTo(seekBar.value);
+            });
         }
 
+        // --- コントロール関数 ---
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
-            player.playVideo();
-            // 開始時にボタンのラベルを同期
-            document.getElementById('play-pause-btn').innerText = "一時停止";
+            if (player && player.playVideo) {
+                player.playVideo();
+                document.getElementById('play-pause-btn').innerText = "PAUSE";
+            }
         }
 
         function togglePlay() {
+            if (!player || !player.getPlayerState) return;
             const state = player.getPlayerState();
             const btn = document.getElementById('play-pause-btn');
-            if (state === 1) { // 再生中なら
+            
+            if (state === 1) { // 再生中
                 player.pauseVideo();
-                btn.innerText = "再開";
-                btn.style.backgroundColor = "#fff"; // 停止中は目立つように白くする
-                btn.style.color = "#000";
+                btn.innerText = "PLAY";
             } else {
                 player.playVideo();
-                btn.innerText = "一時停止";
-                btn.style.backgroundColor = ""; // 元に戻す
-                btn.style.color = "";
+                btn.innerText = "PAUSE";
             }
         }
 
         function skip(sec) {
-            player.seekTo(player.getCurrentTime() + sec);
+            if (player && player.getCurrentTime) {
+                player.seekTo(player.getCurrentTime() + sec);
+            }
         }
 
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+                else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        }
+
+        // --- メイン画面更新ロジック ---
         function updateMonitor() {
+            if (!player || !player.getCurrentTime) return;
+            
             const currentTime = player.getCurrentTime();
-            seekBar.value = currentTime;
+            if(document.activeElement !== seekBar) seekBar.value = currentTime;
             
             let lastMemoIndex = -1;
             let currentLyrics = "";
@@ -183,16 +293,32 @@
                 
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
-                let names = (parts[1] || "").replace(/・/g, '\n');
+                
+                // 名前リスト処理
+                let nameStr = (parts[1] || "").trim();
+                let names = "";
+                
+                if (nameStr) {
+                    let nameList = nameStr.split('・');
+                    if (nameList.length >= 3) {
+                        // 3人以上は2行に
+                        let half = Math.ceil(nameList.length / 2);
+                        names = nameList.slice(0, half).join('・') + "\n" + nameList.slice(half).join('・');
+                        nameEl.classList.add('two-lines-mode');
+                    } else {
+                        // 2人以下は1行 (改行区切り)
+                        names = nameList.join('\n');
+                        nameEl.classList.remove('two-lines-mode');
+                    }
+                }
 
                 actionEl.innerText = action;
                 nameEl.innerText = names;
 
-                if (info.isPrep) container.classList.add('is-prep');
-                else container.classList.remove('is-prep');
+                if (info.isPrep) document.body.classList.add('is-prep');
+                else document.body.classList.remove('is-prep');
 
-                // 背景色クラスを適用
-                document.body.className = "monitor-body " + info.bgClass;
+                document.body.className = "monitor-body " + info.bgClass + (info.isPrep ? " is-prep" : "");
             }
         }
     </script>
