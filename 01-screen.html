@@ -29,15 +29,17 @@
         .bg-orange{ background: linear-gradient(135deg, #cc4400 0%, #662200 100%); }
         .bg-purple{ background: linear-gradient(135deg, #5500aa 0%, #220044 100%); }
 
-        /* --- 【新機能】準備モード（黄色い警告） --- */
-        @keyframes warning-flash {
-            0% { border-color: #ffcc00; box-shadow: inset 0 0 50px rgba(255, 204, 0, 0.5); }
-            50% { border-color: #000; box-shadow: inset 0 0 0px rgba(0,0,0,0); }
-            100% { border-color: #ffcc00; box-shadow: inset 0 0 50px rgba(255, 204, 0, 0.5); }
+        /* --- 【修正】準備モード（画面全体が点滅） --- */
+        @keyframes prep-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; } /* 暗くなる */
+            100% { opacity: 1; }
         }
-        body.monitor-body.warning-mode {
-            border: 20px solid #ffcc00;
-            animation: warning-flash 1.0s infinite;
+        /* 準備中は背景が黒ベースで点滅する */
+        body.monitor-body.is-prep {
+            background: #222; /* ベースの色 */
+            animation: prep-blink 1.2s infinite ease-in-out;
+            border: 5px solid #666; /* 控えめな枠線 */
         }
 
         /* --- メインエリア --- */
@@ -84,27 +86,7 @@
         }
         #name-label.two-lines-mode { font-size: 10vmin !important; line-height: 1.2; }
 
-        /* --- 【新機能】次アクション予告エリア --- */
-        #next-alert {
-            margin-top: 5vh;
-            padding: 15px 30px;
-            background: rgba(255, 204, 0, 0.9);
-            color: #000;
-            font-weight: bold;
-            font-size: 4vmin;
-            border-radius: 10px;
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
-        }
-        body.monitor-body.warning-mode #next-alert {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* --- その他UI --- */
+        /* --- UI --- */
         #header-controls {
             position: absolute; top: 10px; left: 10px; right: 10px;
             display: flex; justify-content: space-between; z-index: 100;
@@ -152,8 +134,6 @@
         <span id="action-label">READY</span>
         <br>
         <span id="name-label">...</span>
-        <br>
-        <div id="next-alert">NEXT: ???</div>
     </div>
 
     <div id="controls">
@@ -175,7 +155,6 @@
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
-        const nextAlertEl = document.getElementById('next-alert');
         const seekBar = document.getElementById('seek-bar');
 
         let dataSec = [];
@@ -196,18 +175,24 @@
 
         function getMemoInfo(memo) {
             let bgClass = "bg-black";
-            if (!memo) return { bgClass };
+            let isPrep = false;
+            if (!memo) return { bgClass, isPrep };
             
             if (memo.includes("大字")) bgClass = "bg-red";
             else if (memo.includes("絵") || memo.includes("めくる") || memo.includes("青")) bgClass = "bg-blue";
             else if (memo.includes("板") || memo.includes("緑")) bgClass = "bg-green";
-            else if (memo.includes("色") || memo.includes("橙")) bgClass = "bg-orange";
+            // スプレーを追加
+            else if (memo.includes("色") || memo.includes("橙") || memo.includes("スプレー")) bgClass = "bg-orange";
             else if (memo.includes("退場") || memo.includes("紫")) bgClass = "bg-purple";
             else if (memo.includes("赤")) bgClass = "bg-red";
-            // 準備という言葉自体が含まれていたらデフォルトで黒にする
-            else if (memo.includes("準備")) bgClass = "bg-black";
             
-            return { bgClass };
+            // 準備判定
+            if (memo.includes("準備")) {
+                isPrep = true;
+                bgClass = "bg-black"; // 準備中は基本黒背景で点滅させる
+            }
+            
+            return { bgClass, isPrep };
         }
 
         function onYouTubeIframeAPIReady() {
@@ -249,7 +234,6 @@
             const currentTime = player.getCurrentTime();
             if(document.activeElement !== seekBar) seekBar.value = currentTime;
             
-            // --- 1. 現在の表示 ---
             let currentIndex = -1;
             let currentLyrics = "";
             for (let i = 0; i < dataSec.length; i++) {
@@ -261,11 +245,13 @@
 
             lyricsEl.innerText = currentLyrics || "";
             let bgClass = "bg-black";
+            let isPrep = false;
 
             if (currentIndex !== -1) {
                 let memo = dataSec[currentIndex].m;
                 const info = getMemoInfo(memo);
                 bgClass = info.bgClass;
+                isPrep = info.isPrep;
 
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
@@ -287,37 +273,8 @@
                 nameEl.innerText = names;
             }
 
-            // --- 2. 次アクション予告＆警告 ---
-            let nextIndex = -1;
-            for (let i = 0; i < dataSec.length; i++) {
-                if (dataSec[i].s > currentTime && dataSec[i].m && dataSec[i].m.trim() !== "") {
-                    nextIndex = i;
-                    break;
-                }
-            }
-
-            let isWarning = false;
-            if (nextIndex !== -1) {
-                const nextItem = dataSec[nextIndex];
-                const timeLeft = nextItem.s - currentTime;
-
-                // 8秒前からカウントダウン開始
-                if (timeLeft <= 8 && timeLeft > 0) {
-                    isWarning = true;
-                    let nextParts = nextItem.m.split(/[、]/);
-                    let nextAction = nextParts[0]; 
-                    nextAlertEl.innerText = `NEXT: ${nextAction} (${timeLeft.toFixed(1)})`;
-                }
-            }
-
-            // 警告モード適用
-            if (isWarning) {
-                document.body.classList.add('warning-mode');
-                document.body.className = `monitor-body ${bgClass} warning-mode`;
-            } else {
-                document.body.classList.remove('warning-mode');
-                document.body.className = `monitor-body ${bgClass}`;
-            }
+            // クラス適用（点滅or色背景）
+            document.body.className = `monitor-body ${bgClass} ${isPrep ? 'is-prep' : ''}`;
         }
     </script>
 </body>
