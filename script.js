@@ -20,16 +20,16 @@ function initApp(data, videoElementId) {
         let colorClass = "";
         if (memo) {
             const m = memo.trim();
-            if (m.includes("決め") || m.includes("重要")) {
-                colorClass = "memo-color-1"; // 赤系
-            } else if (m.includes("サビ")) {
-                colorClass = "memo-color-2"; // 青・緑系（目立つ色）
-            } else if (m.includes("間奏") || m.includes("♪") || m.includes("Instrumental")) {
-                colorClass = "memo-color-3"; // 緑系（楽器セクション）
-            } else if (m.includes("期待") || m.includes("変化")) {
-                colorClass = "memo-color-4"; // オレンジ系
+            if (m.includes("大字") {
+                colorClass = "memo-color-1"; // 赤
+            } else if (m.includes("色")) {
+                colorClass = "memo-color-2"; // 青
+            } else if (m.includes("文字") {
+                colorClass = "memo-color-3"; // 緑
+            } else if (m.includes("スプレー") {
+                colorClass = "memo-color-4"; // オレンジ
             } else {
-                colorClass = "memo-color-5"; // 紫系（その他）
+                colorClass = "memo-color-5"; // 紫
             }
         }
 
