@@ -3,81 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モニターPro - コンパクト版</title>
+    <title>モニターPro - 統一デザイン版</title>
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* --- 文字サイズと余白のコンパクト化 --- */
+        /* 01-screen.html 独自の上書きスタイル 
+           (文字の視認性に関わる部分はここで微調整)
+        */
 
-        /* 1. 歌詞ガイド */
+        /* 1. 歌詞ガイド：明朝体で上品に */
         #lyrics-guide { 
-            font-size: 3.5vmin; /* 4vmin -> 3.5vmin */
-            color: rgba(255,255,255,0.8) !important;
-            margin-bottom: 1vh; /* 2vh -> 1vh (余白半減) */
+            font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+            font-size: 3.5vmin;
+            color: rgba(255,255,255,0.7) !important; /* 少し落ち着いた白 */
+            margin-bottom: 1vh;
             min-height: 1.2em;
-            font-weight: bold;
+            letter-spacing: 0.05em;
             flex-shrink: 0;
         }
 
-        /* 2. アクション指示（READYなど） */
+        /* 2. アクション指示（READY）：ここは読みやすさ優先でゴシック */
         #action-label { 
-            font-size: 8vmin; /* 10vmin -> 8vmin */
+            font-family: "Hiragino Sans", "Meiryo", sans-serif;
+            font-size: 8vmin;
             font-weight: bold; 
-            margin-bottom: 0.5vh; /* 1vh -> 0.5vh (ほぼ隙間なし) */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 0vh;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 0.1em;
             flex-shrink: 0;
         }
 
-        /* 3. 名前表示 */
+        /* 3. 名前表示：最重要情報なので極太ゴシック */
         #name-label { 
-            font-size: 16vmin; /* 20vmin -> 16vmin */
+            font-family: "Hiragino Sans", "Meiryo", sans-serif;
+            font-size: 16vmin; 
             font-weight: 900; 
-            line-height: 1.0; 
+            line-height: 1.1; 
             white-space: pre-wrap; 
-            text-shadow: 4px 4px 10px rgba(0,0,0,0.6);
+            text-shadow: 4px 4px 10px rgba(0,0,0,0.8);
             width: 95%;
             word-wrap: break-word;
         }
 
-        /* コントロールバー内のパーツも小さく */
-        #seek-bar { 
-            width: 90%; 
-            cursor: pointer; 
-            height: 20px; /* 少し細く */
-            margin-bottom: 5px; /* 余白削減 */
-        }
+        /* ボタン配置のコンテナ */
         .btn-row { 
             display: flex; 
-            gap: 15px; /* 間隔も狭く */
+            gap: 15px; 
             width: 95%; 
+            max-width: 600px; /* PCで横に伸びすぎないように */
             justify-content: center; 
         }
-        .ctrl-btn { 
-            flex: 1; max-width: 100px;
-            background: rgba(255,255,255,0.15); 
-            border: 1px solid rgba(255,255,255,0.5); 
-            color: #fff; 
-            padding: 8px 0; /* タップ領域の高さを減らす (12px -> 8px) */
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 14px; /* 文字サイズも少し小さく (16px -> 14px) */
-            font-weight: bold;
-            user-select: none;
-        }
-        .ctrl-btn:active { background: rgba(255,255,255,0.4); }
-
+        
         #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
     </style>
 </head>
 <body class="monitor-body bg-black">
 
-    <a href="index.html" id="back-to-index-btn" class="btn">← 戻る</a>
-    <button id="fullscreen-btn" onclick="toggleFullScreen()">全画面</button>
+    <div id="header-controls">
+        <a href="index.html" id="back-to-index-btn">← 戻る</a>
+        <button id="fullscreen-btn" onclick="toggleFullScreen()">全画面</button>
+    </div>
 
     <div id="start-overlay" onclick="startPerformance()">
         <div class="big-start-btn">
             練習開始<br>
-            <span style="font-size:1.5rem; font-weight:normal;">(Tap to Start)</span>
+            <span style="font-size:1.2rem; font-weight:normal; display:block; margin-top:10px;">(画面をタップ)</span>
         </div>
     </div>
 
@@ -90,9 +80,9 @@
     <div id="controls">
         <input type="range" id="seek-bar" value="0" step="1">
         <div class="btn-row">
-            <button class="ctrl-btn" onclick="skip(-10)">-10</button>
-            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">PAUSE</button>
-            <button class="ctrl-btn" onclick="skip(10)">+10</button>
+            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
+            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">一時停止</button>
+            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
         </div>
     </div>
     
@@ -147,16 +137,23 @@
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
             player.playVideo();
+            // 開始時にボタンのラベルを同期
+            document.getElementById('play-pause-btn').innerText = "一時停止";
         }
 
         function togglePlay() {
             const state = player.getPlayerState();
-            if (state === 1) {
+            const btn = document.getElementById('play-pause-btn');
+            if (state === 1) { // 再生中なら
                 player.pauseVideo();
-                document.getElementById('play-pause-btn').innerText = "PLAY";
+                btn.innerText = "再開";
+                btn.style.backgroundColor = "#fff"; // 停止中は目立つように白くする
+                btn.style.color = "#000";
             } else {
                 player.playVideo();
-                document.getElementById('play-pause-btn').innerText = "PAUSE";
+                btn.innerText = "一時停止";
+                btn.style.backgroundColor = ""; // 元に戻す
+                btn.style.color = "";
             }
         }
 
@@ -194,6 +191,7 @@
                 if (info.isPrep) container.classList.add('is-prep');
                 else container.classList.remove('is-prep');
 
+                // 背景色クラスを適用
                 document.body.className = "monitor-body " + info.bgClass;
             }
         }
