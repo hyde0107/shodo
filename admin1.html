@@ -22,7 +22,6 @@
             const input = document.getElementById('inputText').value.trim();
             if (!input) return;
             let resultArray = [];
-
             if (input.includes('-->')) { // SRT形式
                 const blocks = input.split(/\n\s*\n/);
                 blocks.forEach(block => {
@@ -31,39 +30,19 @@
                     if (timeMatch) {
                         const timeStr = `${timeMatch[2]}:${timeMatch[3]}`;
                         const text = lines.slice(2).join(' ').trim();
-                        // ♪だけの行を除外
                         if (text && text !== '♪') resultArray.push(`  ["${timeStr}", "${text}", ""]`);
                     }
                 });
-            } else { // 自由形式 (01:20 歌詞)
+            } else { // 自由形式
                 const lines = input.split('\n');
                 lines.forEach(line => {
-                    // 正規表現を少し強化：タブや複数のスペースにも対応
-                    const match = line.match(/(\d{1,2}:\d{2})[\s　]+(.*)/);
-                    if (match) resultArray.push(`  ["${match[1]}", "${match[2].trim()}", ""]`);
+                    const match = line.match(/(\d{1,2}:\d{2})\s+(.*)/);
+                    if (match) resultArray.push(`  ["${match[1]}", "${match[2]}", ""]`);
                 });
             }
-
             const output = document.getElementById('result');
-            const code = `const myData = [\n${resultArray.join(',\n')}\n];`;
-            output.textContent = code;
+            output.textContent = `const myData = [\n${resultArray.join(',\n')}\n];`;
             output.style.display = "block";
-
-            // --- 追加機能：コピーボタンを自動生成 ---
-            if (!document.getElementById('copy-btn')) {
-                const copyBtn = document.createElement('button');
-                copyBtn.id = 'copy-btn';
-                copyBtn.className = 'btn';
-                copyBtn.style.width = "100%";
-                copyBtn.style.marginTop = "10px";
-                copyBtn.innerText = "生成されたコードをコピー";
-                copyBtn.onclick = () => {
-                    navigator.clipboard.writeText(code);
-                    copyBtn.innerText = "コピー完了！";
-                    setTimeout(() => copyBtn.innerText = "生成されたコードをコピー", 2000);
-                };
-                output.parentNode.insertBefore(copyBtn, output.nextSibling);
-            }
         }
     </script>
 </body>
