@@ -3,109 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>モニターPro - レイアウト修正版</title>
+    <link rel="stylesheet" href="style.css">
     <style>
+        /* HTML固有の微調整があればここに書くが、基本はstyle.cssへ */
         body {
-            margin: 0;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-color: #000;
-            color: #fff;
-            font-family: "Hiragino Sans", "Meiryo", sans-serif;
             overflow: hidden;
-            transition: background-color 0.4s;
+            background-color: #000; /* 初期値 */
         }
-
-        /* スタート画面 */
-        #start-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #111;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            cursor: pointer;
-        }
-        #start-btn {
-            padding: 20px 40px;
-            font-size: 24px;
-            background: #fff;
-            color: #000;
-            border-radius: 50px;
-            font-weight: bold;
-        }
-
-        /* --- メイン表示エリア（ここを上に寄せる） --- */
-        #monitor-container {
-            flex: 1; /* 残りの空間をすべて使う */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* 中央やや上に配置 */
-            align-items: center;
-            text-align: center;
-            width: 100%;
-            padding-bottom: 15vh; /* 下部の操作バーとのマージンを強制確保 */
-            box-sizing: border-box;
-        }
-
-        #lyrics-guide { 
-            font-size: 3vw; 
-            color: rgba(255,255,255,0.8); 
-            margin-bottom: 2vh;
-            height: 1.2em;
-            font-weight: bold;
-        }
-        #action-label { 
-            font-size: 5vw; 
-            font-weight: bold; 
-            margin-bottom: 1vh;
-            opacity: 0.9;
-        }
-        #name-label { 
-            font-size: 15vw; /* 少しだけ小さくして確実に収める */
-            font-weight: 900; 
-            line-height: 1.1; 
-            white-space: pre-wrap;
-            text-shadow: 2px 2px 15px rgba(0,0,0,0.5);
-        }
-
-        /* --- 操作パネル（画面下部に固定） --- */
-        #controls {
-            height: 120px; /* 高さを固定 */
-            width: 100%;
-            background: rgba(0,0,0,0.8);
-            border-top: 1px solid rgba(255,255,255,0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1500;
-        }
-
-        #seek-bar { width: 90%; cursor: pointer; height: 30px; }
-        .btn-row { display: flex; gap: 30px; margin-top: 5px; }
-        .ctrl-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #fff;
-            color: #fff;
-            padding: 8px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* 背景色とアニメーション（これまでのロジックを継承） */
-        @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .is-prep { animation: flash-prep 1.5s infinite; }
-
-        .bg-red { background-color: #ff0000; } .bg-red-prep { background-color: #660000; }
-        .bg-blue { background-color: #007bff; } .bg-blue-prep { background-color: #002244; }
-        .bg-green { background-color: #28a745; } .bg-green-prep { background-color: #0d3316; }
-        .bg-orange { background-color: #fd7e14; } .bg-orange-prep { background-color: #663300; }
-        .bg-purple { background-color: #6f42c1; } .bg-purple-prep { background-color: #2d1a4d; }
-        .bg-black { background-color: #000; }
-
+        /* YouTubeプレーヤー非表示用 */
         #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
     </style>
 </head>
@@ -133,111 +39,21 @@
     <div id="player-wrapper"><div id="player"></div></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        // myDataは前回のものをそのまま使用
-        const myData = [
-            ["00:00", "一番きれいな色ってなんだろう？", "色①、るな・みゆ"],
-    ["00:07", "一番ひかってるものってなんだろう？", ""],
-    ["00:13", "僕は探していた 最高のGIFTを", ""],
-    ["00:20", "君が喜んだ姿をイメージしながら", ""],
-    ["00:26", "♪ (Instrumental)", "スプレー準備、あん・さき"],
-    ["00:37", "「本当の自分」を見つけたいって言うけど", "スプレー、あん・さき"],
-    ["00:44", "「生まれた意味」を知りたいって言うけど", ""],
-    ["00:50", "僕の両手がそれを渡す時", ""],
-    ["00:56", "ふと謎が解けるといいな 受け取ってくれるかな", ""],
-    ["01:07", "長い間 君に渡したくて", ""],
-    ["01:13", "強く握り締めていたから", ""],
-    ["01:18", "もうグジャグジャになって 色は変わり果て", "大字準備、さえ・ひで"],
-    ["01:25", "お世辞にもきれいとは言えないけど", ""],
-    ["01:30", "「白か黒で答えろ」という", "大字、さえ・ひで"],
-    ["01:35", "難題を突きつけられ", ""],
-    ["01:38", "ぶち当たった壁の前で", "色②準備、あん・るな"],
-    ["01:42", "僕らはまた迷っている 迷ってるけど", ""],
-    ["01:50", "白と黒のその間に", "色②、あん・るな"],
-    ["01:55", "無限の色が広がってる", ""],
-    ["01:58", "君に似合う色探して やさしい名前をつけたなら", ""],
-    ["02:04", "ほほ 一番きれいな色", ""],
-    ["02:09", "今 君に贈るよ", ""],
-    ["02:13", "♪ (Instrumental)", ""],
-    ["02:17", "地平線の先に辿り着いても", ""],
-    ["02:24", "新しい地平線が広がるだけ", ""],
-    ["02:30", "「もうやめにしようか？」 自分の胸に聞くと", ""],
-    ["02:38", "「まだ歩き続けたい」と返事が聞こえたよ", "大字準備、さき・みゆ"],
-    ["02:47", "知らぬ間に増えていった荷物も", "大字、さき・みゆ"],
-    ["02:53", "まだなんとか背負っていけるから", ""],
-    ["02:58", "君の分まで持つよ だからそばにいてよ", "文字準備、あん・ひで"],
-    ["03:06", "それだけで心は軽くなる", ""],
-    ["03:11", "果てしない旅路の果てに", "文字、あん・ひで"],
-    ["03:16", "「選ばれる者」とは誰？", ""],
-    ["03:19", "たとえ僕じゃなくたって", ""],
-    ["03:22", "それでもまた走っていく 走っていくよ", ""],
-    ["03:31", "降り注ぐ日差しがあって", ""],
-    ["03:35", "だからこそ日陰もあって", ""],
-    ["03:38", "そのすべてが意味を持って", ""],
-    ["03:42", "互いを讃えているのなら", ""],
-    ["03:45", "もうどんな場所にいても", "色③準備、みゆ・さえ"],
-    ["03:50", "光を感じれるよ", ""],
-    ["03:53", "♪ (Instrumental)", "色③、みゆ・さえ"],
-    ["03:56", "♪ (Instrumental)", "書道部文字準備、さき"],
-    ["04:04", "今 君に贈るよ 気に入るかなぁ？受け取ってよ", "書道部文字、さき"],
-    ["04:17", "君とだから探せたよ 僕の方こそありがとう", ""],
-    ["04:31", "lalalala", "大字準備、あん・ひな"],
-    ["04:47", "一番きれいな色ってなんだろう？", "大字、あん・ひな"],
-    ["04:54", "一番ひかってるものってなんだろう？", ""],
-    ["04:59", "僕は抱きしめる 君がくれたgiftを", ""],
-    ["05:07", "いつまでも胸の奥で", ""],
-    ["05:11", "ほほ ひかってるんだよ", ""],
-    ["05:17", "ひかり続けんだよ", ""],
-    ["05:30", "♪ (Instrumental)", "大字準備、るな・ひで"],
-    ["05:40", "辿り着く果てまで", "大字、るな・ひで"],
-    ["05:44", "苦しみは尽きぬけど 歓声に身を任せて", ""],
-    ["05:51", "期待×不安定 望んで 突き抜けろ", ""],
-    ["05:56", "広げた腕で待っている 今", "文字準備、ひな・みゆ"],
-    ["06:03", "(Whoa, whoa-oh-oh, whoa)", ""],
-    ["06:08", "♪ (Instrumental)", ""],
-    ["06:12", "記録を付けては体温", "文字、ひな・みゆ"],
-    ["06:14", "日差しを浴びていたいよ", ""],
-    ["06:17", "嫌いにならないで 自分を退けないで", ""],
-    ["06:22", "唯一無二の人になりたかった", ""],
-    ["06:28", "あぁ 認めたくないな", "大字準備、あん・さき"],
-    ["06:30", "褒められたかった", ""],
-    ["06:35", "辿り着く果てなんて", "大字、あん・さき"],
-    ["06:39", "あるかわからないけど 感性に身を任せて", ""],
-    ["06:45", "不安を掛けないで 割って 突き抜けろ", ""],
-    ["06:51", "張り詰めた身体が踊っている", ""],
-    ["06:56", "綺麗な花もいいけど", "色④準備、ひで・ひな"],
-    ["06:59", "傷をも誇れる花になろう", ""],
-    ["07:05", "(Whoa, whoa-oh-oh, whoa)", "色④、ひで・ひな"],
-    ["07:15", "良い人なんかじゃないよ", "文字準備、さき・さえ"],
-    ["07:17", "怪我をした心は痛いよ", ""],
-    ["07:20", "神様は何をしているの？観ているの？", ""],
-    ["07:25", "いつか おとぎ話のように", ""],
-    ["07:30", "綺麗になってしまうのかな", ""],
-    ["07:33", "血と汗が ただ", ""],
-    ["07:40", "♪ (Instrumental)", ""],
-    ["08:00", "ゴールテープを探そう", ""],
-    ["08:05", "輪になって語ろう", ""],
-    ["08:10", "本当に我々は 遠回りする生き物", "文字準備、るな・ひな"],
-    ["08:21", "嫌気がさすよ 共々", "文字、るな・ひな"],
-    ["08:26", "灰になって空を舞おう", ""],
-    ["08:31", "本当に神々は 私たちを試している", ""],
-    ["08:42", "♪ (Instrumental)", "色⑤準備、さき・さえ"],
-    ["08:49", "試している", ""],
-    ["08:53", "♪ (Instrumental)", "色⑤、さき・さえ"],
-    ["09:05", "いつの日にか あの朝も 消えるんだろうか", "大字準備、ひな"],
-    ["09:09", "その時が来るまでは", ""],
-    ["09:13", "綺麗な花もいいけど", "大字、ひな"],
-    ["09:17", "傷をも誇れる花になろう", ""],
-    ["09:21", "愛に満ちたこの日々に 何を残そう", ""],
-    ["09:27", "そう 今こそ 生まれてきた意味を刻む時だ", "立ち上げ、みんな"]
-        ];
-
+    <script src="script.js"></script> <script src="data01.js"></script> <script>
         let player;
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
         const seekBar = document.getElementById('seek-bar');
         const container = document.getElementById('monitor-container');
+
+        // script.jsの便利関数を使ってデータを整形
+        // performanceDataは data01.js から来る
+        const dataSec = performanceData.map(d => ({
+            s: parseTime(d[0]), // 共通関数 parseTime
+            l: d[1], 
+            m: d[2]
+        }));
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
@@ -279,8 +95,7 @@
             
             let lastMemoIndex = -1;
             let currentLyrics = "";
-            const dataSec = myData.map(d => ({s: toSeconds(d[0]), l: d[1], m: d[2]}));
-            
+
             for (let i = 0; i < dataSec.length; i++) {
                 if (currentTime >= dataSec[i].s) {
                     currentLyrics = dataSec[i].l;
@@ -292,29 +107,25 @@
 
             if (lastMemoIndex !== -1) {
                 let memo = dataSec[lastMemoIndex].m;
+                
+                // 共通関数 getMemoInfo で色情報を取得
+                const info = getMemoInfo(memo);
+                
+                // 表示用テキストの分解
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
                 let names = (parts[1] || "").replace(/・/g, '\n');
-                let isPrep = action.includes("準備");
 
                 actionEl.innerText = action;
                 nameEl.innerText = names;
 
-                if (isPrep) container.classList.add('is-prep');
+                // クラスの適用
+                if (info.isPrep) container.classList.add('is-prep');
                 else container.classList.remove('is-prep');
 
-                let base = "purple";
-                if (memo.includes("大字")) base = "red";
-                else if (memo.includes("色")) base = "blue";
-                else if (memo.includes("文字")) base = "green";
-                else if (memo.includes("スプレー")) base = "orange";
-                document.body.className = "bg-" + base + (isPrep ? "-prep" : "");
+                // bodyのクラスを書き換え（共通ロジック由来）
+                document.body.className = info.bgClass;
             }
-        }
-
-        function toSeconds(t) {
-            const p = t.split(':').reverse();
-            return parseInt(p[0]) + (parseInt(p[1] || 0) * 60);
         }
     </script>
 </body>
