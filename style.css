@@ -37,7 +37,7 @@ h1 {
     letter-spacing: 0.1em;
 }
 
-/* --- ボタン共通デザイン（四角・線画） --- */
+/* --- ボタン共通デザイン（通常ページ用） --- */
 .btn {
     display: inline-block;
     text-decoration: none;
@@ -49,13 +49,12 @@ h1 {
     transition: all 0.2s ease;
     font-size: 0.95em;
     text-align: center;
-    border-radius: 0; /* 角丸なし：クールな印象に */
+    border-radius: 2px;
 }
 .btn:hover {
     background: #111;
     color: #fff;
 }
-/* 戻るボタンの位置調整 */
 .back-link { margin-top: 20px; }
 
 
@@ -85,9 +84,10 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-height: 120px; /* ハンコが被らないよう高さを確保 */
 }
 .card:hover {
-    box-shadow: 6px 6px 0px rgba(0,0,0,0.1); /* 影もくっきりさせる */
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.1);
     transform: translateY(-2px);
 }
 .card h2 {
@@ -101,12 +101,13 @@ h1 {
     color: #555;
     margin: 0;
     line-height: 1.5;
+    margin-bottom: 20px; /* 下に余白を作ってハンコ用スペース確保 */
 }
 
-/* 「進行中」などのハンコ風デザイン */
+/* 「進行中」ハンコ（右下に配置） */
 .hanko {
     position: absolute;
-    top: 15px;
+    bottom: 15px; /* 右下に変更 */
     right: 15px;
     border: 2px solid #d9534f; /* 朱色 */
     color: #d9534f;
@@ -116,7 +117,8 @@ h1 {
     border-radius: 4px;
     transform: rotate(-10deg);
     opacity: 0.9;
-    font-family: "Hiragino Sans", sans-serif; /* ハンコはゴシックで見やすく */
+    font-family: "Hiragino Sans", sans-serif;
+    background: rgba(255,255,255,0.8); /* 文字の上に重なっても読めるように */
 }
 
 /* 管理者フッター */
@@ -146,10 +148,8 @@ h1 {
 .player-section {
     flex: 1;
     min-width: 300px;
-    /* 動画のレスポンシブ対応 */
     position: relative;
 }
-/* iframeやvideoタグを親要素に合わせる */
 .video-container {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -165,9 +165,9 @@ iframe, video {
     flex: 1;
     min-width: 300px;
     background: #fff;
-    padding: 0; /* paddingは内部のアイテムに任せる */
+    padding: 0;
     border: 1px solid #111;
-    height: 60vh; /* 高さ固定 */
+    height: 60vh;
     max-height: 500px;
     overflow-y: auto;
 }
@@ -185,9 +185,9 @@ iframe, video {
 
 /* 再生中のハイライト */
 .timestamp-item.playing {
-    background: #f0eee9; /* メインカラーの薄い版 */
-    border-left: 5px solid #111;
-    padding-left: 10px; /* ボーダー分ずれないように調整 */
+    background: #e6f7ff; /* 元の青系ハイライトに戻し視認性確保 */
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
 }
 
 .item-main { display: flex; align-items: baseline; }
@@ -204,19 +204,18 @@ iframe, video {
 .memo-content {
     margin-top: 4px;
     margin-left: 0;
-    padding-left: 60px; /* 時間部分の幅に合わせる */
+    padding-left: 60px;
     font-size: 0.85rem;
-    font-family: "Hiragino Sans", "Meiryo", sans-serif; /* メモは読みやすいゴシック */
+    font-family: "Hiragino Sans", "Meiryo", sans-serif;
     color: #666;
 }
 .memo-content:empty { display: none; }
 
-/* 色定義（重要） */
-.memo-color-1 { color: #d9534f !important; font-weight: bold; } /* 赤：大字 */
-.memo-color-2 { color: #007bff !important; font-weight: bold; } /* 青：色 */
-.memo-color-3 { color: #28a745 !important; font-weight: bold; } /* 緑：文字 */
-.memo-color-4 { color: #fd7e14 !important; font-weight: bold; } /* 橙：スプレー */
-.memo-color-5 { color: #6f42c1 !important; font-weight: bold; } /* 紫：その他 */
+.memo-color-1 { color: #d9534f !important; font-weight: bold; }
+.memo-color-2 { color: #007bff !important; font-weight: bold; }
+.memo-color-3 { color: #28a745 !important; font-weight: bold; }
+.memo-color-4 { color: #fd7e14 !important; font-weight: bold; }
+.memo-color-5 { color: #6f42c1 !important; font-weight: bold; }
 
 /* 管理者用テキストエリア */
 .admin-box { background: #fff; border: 1px solid #111; padding: 25px; width: 100%; box-sizing: border-box; }
@@ -225,24 +224,24 @@ iframe, video {
 
 /* =========================================
    4. モニター画面専用 (01-screen.html)
+   【元の機能特化デザインに復元】
    ========================================= */
 
-/* box-sizingの初期化（ここだけ全体適用） */
+/* box-sizing初期化（モニター画面用） */
 *, *::before, *::after { box-sizing: border-box; }
 
-/* モニター画面のBODY：他ページのスタイルを上書き */
 body.monitor-body {
     background-color: #000000;
     color: #ffffff !important;
-    
-    /* 視認性重視でゴシック体 */
-    font-family: "Hiragino Sans", "Meiryo", sans-serif;
+    font-family: "Hiragino Sans", "Meiryo", sans-serif; /* 視認性重視 */
     
     position: fixed; top: 0; left: 0;
     width: 100%; height: 100%; height: 100dvh;
     overflow: hidden;
     margin: 0 !important; padding: 0 !important;
-    display: flex; flex-direction: column;
+    
+    display: flex;
+    flex-direction: column;
 }
 
 /* メイン表示エリア */
@@ -251,60 +250,64 @@ body.monitor-body {
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
     text-align: center;
-    width: 100%; min-height: 0; overflow: hidden; padding: 10px;
-    transition: background-color 0.3s ease;
+    width: 100%; min-height: 0; overflow: hidden; padding: 5px;
 }
 
-/* コントロールバー：黒背景・シンプル */
+/* コントロールバー（元の高さ・黒背景） */
 #controls {
     height: 90px;
     flex-shrink: 0;
     width: 100%;
-    background: #000;
-    border-top: 1px solid #333;
+    background: rgba(0,0,0,0.8);
+    border-top: 1px solid rgba(255,255,255,0.3);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     z-index: 1500;
-    padding-bottom: 15px; padding-top: 10px;
+    padding-bottom: 10px; padding-top: 5px;
 }
 
-/* モニター画面専用ボタン */
+/* ボタン行 */
+.btn-row { 
+    display: flex; 
+    gap: 15px; 
+    width: 95%; 
+    max-width: 600px;
+    justify-content: center; 
+}
+
+/* モニター用ボタン（元の丸みのあるデザイン） */
 .ctrl-btn {
     flex: 1; max-width: 120px;
-    background: transparent;
-    border: 1px solid #fff; /* 白い細枠 */
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
     color: #fff;
-    padding: 8px 0;
+    padding: 10px 0;
     cursor: pointer;
     font-size: 0.9rem;
-    font-weight: normal;
-    border-radius: 0; /* 四角 */
+    font-weight: bold;
+    border-radius: 20px; /* 元の丸み */
     transition: all 0.2s;
-    font-family: inherit;
 }
 .ctrl-btn:active, .ctrl-btn:hover {
     background: #fff;
     color: #000;
 }
 
-/* 開始ボタン */
+/* 開始ボタン（元の大きな丸いボタン） */
 .big-start-btn {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: transparent;
-    padding: 2rem 4rem;
-    border: 2px solid #fff;
-    cursor: pointer;
-    text-align: center;
-    margin-bottom: 10vh;
-    transition: 0.2s;
-    border-radius: 0;
-}
-.big-start-btn:active {
+    font-size: 3rem; 
+    font-weight: bold; 
+    color: #000; 
     background-color: #fff;
-    color: #000;
+    padding: 3rem 5rem; 
+    border-radius: 100px; /* 丸く */
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255,255,255,0.8); 
+    text-align: center; 
+    margin-bottom: 10vh;
+    border: none;
 }
+.big-start-btn:active { transform: scale(0.95); }
 
 #start-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -312,7 +315,7 @@ body.monitor-body {
     display: flex; justify-content: center; align-items: center; z-index: 9999;
 }
 
-/* ヘッダーボタン類（戻る・全画面） */
+/* ヘッダーボタン（戻る・全画面） */
 #header-controls {
     position: fixed; top: 15px; left: 15px; right: 15px;
     display: flex; justify-content: space-between;
@@ -322,49 +325,49 @@ body.monitor-body {
 #header-controls > * { pointer-events: auto; }
 
 #back-to-index-btn, #fullscreen-btn {
-    background-color: rgba(0,0,0,0.5) !important;
-    color: #fff !important;
-    border: 1px solid rgba(255,255,255,0.5) !important;
+    background-color: rgba(255,255,255,0.9) !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
     padding: 6px 15px;
     font-size: 0.8rem;
     text-decoration: none;
-    border-radius: 0;
-    transition: 0.2s;
-    font-family: "Hiragino Sans", sans-serif;
+    border-radius: 4px;
+    font-family: sans-serif;
+    cursor: pointer;
 }
-#back-to-index-btn:hover, #fullscreen-btn:hover {
-    background-color: #fff !important;
-    color: #000 !important;
-    border-color: #fff !important;
+#fullscreen-btn {
+    background: rgba(0,0,0,0.4) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.3) !important;
 }
 
-/* シークバー（白・シンプル） */
+/* シークバー（操作しやすいデザイン） */
 input[type=range] {
     -webkit-appearance: none; width: 90%; background: transparent; margin-bottom: 10px;
 }
 input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; height: 12px; width: 12px;
+    -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
     background: #fff;
-    cursor: pointer; margin-top: -5px;
-    border-radius: 0; /* つまみも四角 */
+    cursor: pointer; margin-top: -6px;
+    border: none;
 }
 input[type=range]::-webkit-slider-runnable-track {
-    width: 100%; height: 2px; background: #555; border-radius: 0;
+    width: 100%; height: 4px; background: #555; border-radius: 2px;
 }
 
-/* 背景色ユーティリティ（モニター用） */
+/* 背景色ユーティリティ */
 .bg-black { background-color: #000000 !important; }
-.bg-red    { background-color: #800000 !important; }
-.bg-blue   { background-color: #002060 !important; }
-.bg-green  { background-color: #004d00 !important; }
-.bg-orange { background-color: #804000 !important; }
-.bg-purple { background-color: #4b0082 !important; }
+.bg-red    { background-color: #cc0000 !important; }
+.bg-blue   { background-color: #0044cc !important; }
+.bg-green  { background-color: #008800 !important; }
+.bg-orange { background-color: #dd6600 !important; }
+.bg-purple { background-color: #6600cc !important; }
 
 /* 準備中の点滅 */
-.bg-red-prep    { background-color: #400000 !important; }
-.bg-blue-prep   { background-color: #001030 !important; }
-.bg-green-prep  { background-color: #002600 !important; }
-.bg-orange-prep { background-color: #402000 !important; }
-.bg-purple-prep { background-color: #250041 !important; }
-@keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.bg-red-prep    { background-color: #660000 !important; }
+.bg-blue-prep   { background-color: #002244 !important; }
+.bg-green-prep  { background-color: #003300 !important; }
+.bg-orange-prep { background-color: #663300 !important; }
+.bg-purple-prep { background-color: #2d1a4d !important; }
+@keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .is-prep { animation: flash-prep 1.5s infinite; }
