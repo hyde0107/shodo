@@ -1,6 +1,5 @@
 /**
- * 共通ユーティリティ: 時間文字列を秒数に変換
- * 例: "01:23" -> 83
+ * 共通ユーティリティ: 時間文字列("mm:ss")を秒数に変換
  */
 function parseTime(timeStr) {
     if (!timeStr) return 0;
@@ -12,10 +11,10 @@ function parseTime(timeStr) {
 
 /**
  * 共通ユーティリティ: メモからアクションタイプと色情報を取得
- * 戻り値: { type: string, colorClass: string, bgClass: string, isPrep: boolean }
+ * 戻り値: { colorClass: 文字色クラス, bgClass: 背景色クラス, isPrep: 準備かどうか }
  */
 function getMemoInfo(memo) {
-    if (!memo) return { type: "normal", colorClass: "", bgClass: "bg-black", isPrep: false };
+    if (!memo) return { colorClass: "", bgClass: "bg-black", isPrep: false };
     
     const m = memo.trim();
     const isPrep = m.includes("準備");
@@ -41,7 +40,6 @@ function getMemoInfo(memo) {
     const bgClass = `bg-${bgBase}${isPrep ? "-prep" : ""}`;
 
     return { 
-        type: bgBase, 
         colorClass: colorClass, 
         bgClass: bgClass, 
         isPrep: isPrep 
@@ -49,7 +47,7 @@ function getMemoInfo(memo) {
 }
 
 // -------------------------------------------------------
-// 以下、リスト表示用ロジック (元のinitAppを修正して維持)
+// 以下、リスト表示画面（01.html）などで使う初期化ロジック
 // -------------------------------------------------------
 
 function initApp(data, videoElementId) {
@@ -60,15 +58,17 @@ function initApp(data, videoElementId) {
     if(listElement) listElement.innerHTML = "";
 
     data.forEach(([timeStr, text, memo]) => {
-        // 共通関数を使用
+        // 共通関数を使って秒数変換
         const seconds = parseTime(timeStr);
+        // 共通関数を使って色判定
         const info = getMemoInfo(memo);
 
-        // リストアイテム生成（リスト表示画面用）
+        // リストアイテム生成
         if (listElement) {
             const item = document.createElement('div');
             item.className = 'timestamp-item';
-            // info.colorClass を使用
+            
+            // info.colorClass を適用
             item.innerHTML = `
                 <div class="item-main">
                     <span class="time-badge">${timeStr}</span>
@@ -77,6 +77,7 @@ function initApp(data, videoElementId) {
                 <div class="memo-content ${info.colorClass}">${memo || ''}</div>
             `;
             
+            // クリック時のシーク処理
             item.onclick = () => {
                 if (window.player && window.player.seekTo) {
                     window.player.seekTo(seconds, true);
@@ -92,6 +93,7 @@ function initApp(data, videoElementId) {
         }
     });
 
+    // 再生位置に合わせてリストをハイライトする処理
     const updateHighlight = (currentTime) => {
         if (currentTime === undefined || !listElement) return;
         
