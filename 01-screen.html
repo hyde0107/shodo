@@ -3,60 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モニターPro - スクロール完全禁止</title>
+    <title>モニターPro - コンパクト版</title>
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* 文字サイズの調整：vminを使うとはみ出しにくい */
-        
-        /* 歌詞ガイド */
+        /* --- 文字サイズと余白のコンパクト化 --- */
+
+        /* 1. 歌詞ガイド */
         #lyrics-guide { 
-            /* 画面の短い方の辺の 4% のサイズ */
-            font-size: 4vmin; 
+            font-size: 3.5vmin; /* 4vmin -> 3.5vmin */
             color: rgba(255,255,255,0.8) !important;
-            margin-bottom: 2vh;
+            margin-bottom: 1vh; /* 2vh -> 1vh (余白半減) */
             min-height: 1.2em;
             font-weight: bold;
             flex-shrink: 0;
         }
 
-        /* アクション指示（READYなど） */
+        /* 2. アクション指示（READYなど） */
         #action-label { 
-            /* 画面の短い方の辺の 8% のサイズ */
-            font-size: 8vmin; 
+            font-size: 8vmin; /* 10vmin -> 8vmin */
             font-weight: bold; 
-            margin-bottom: 1vh; 
+            margin-bottom: 0.5vh; /* 1vh -> 0.5vh (ほぼ隙間なし) */
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             flex-shrink: 0;
         }
 
-        /* 名前表示 */
+        /* 3. 名前表示 */
         #name-label { 
-            /* これがデカすぎた原因。16vw -> 18vmin に変更 */
-            font-size: 18vmin; 
+            font-size: 16vmin; /* 20vmin -> 16vmin */
             font-weight: 900; 
-            line-height: 1.1; 
+            line-height: 1.0; 
             white-space: pre-wrap; 
             text-shadow: 4px 4px 10px rgba(0,0,0,0.6);
-            
-            /* それでもはみ出しそうな時の安全策 */
-            width: 100%;
+            width: 95%;
             word-wrap: break-word;
         }
 
-        /* コントロールバー内 */
-        #seek-bar { width: 90%; cursor: pointer; height: 30px; margin-bottom: 15px;}
-        .btn-row { display: flex; gap: 20px; width: 95%; justify-content: center; }
+        /* コントロールバー内のパーツも小さく */
+        #seek-bar { 
+            width: 90%; 
+            cursor: pointer; 
+            height: 20px; /* 少し細く */
+            margin-bottom: 5px; /* 余白削減 */
+        }
+        .btn-row { 
+            display: flex; 
+            gap: 15px; /* 間隔も狭く */
+            width: 95%; 
+            justify-content: center; 
+        }
         .ctrl-btn { 
-            flex: 1; max-width: 120px;
+            flex: 1; max-width: 100px;
             background: rgba(255,255,255,0.15); 
             border: 1px solid rgba(255,255,255,0.5); 
             color: #fff; 
-            padding: 15px 0; 
-            border-radius: 8px; 
+            padding: 8px 0; /* タップ領域の高さを減らす (12px -> 8px) */
+            border-radius: 6px; 
             cursor: pointer; 
-            font-size: 16px; 
+            font-size: 14px; /* 文字サイズも少し小さく (16px -> 14px) */
             font-weight: bold;
+            user-select: none;
         }
         .ctrl-btn:active { background: rgba(255,255,255,0.4); }
 
@@ -84,9 +90,9 @@
     <div id="controls">
         <input type="range" id="seek-bar" value="0" step="1">
         <div class="btn-row">
-            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
+            <button class="ctrl-btn" onclick="skip(-10)">-10</button>
             <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">PAUSE</button>
-            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
+            <button class="ctrl-btn" onclick="skip(10)">+10</button>
         </div>
     </div>
     
