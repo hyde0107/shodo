@@ -7,8 +7,8 @@
 
 /* --- 基本設定（和風・シンプル） --- */
 body {
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
-    background: #e8e4df; /* 和紙っぽいベージュ */
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    background: #e8e4df; /* ベースのベージュ */
     color: #111;
     margin: 0;
     padding: 20px;
@@ -28,7 +28,7 @@ body {
 
 h1 {
     font-size: 2.2em;
-    font-weight: normal; /* 明朝体なので細めが綺麗 */
+    font-weight: normal;
     border-bottom: 2px solid #111;
     display: inline-block;
     margin-bottom: 40px;
@@ -37,7 +37,7 @@ h1 {
     letter-spacing: 0.1em;
 }
 
-/* --- ボタン共通デザイン --- */
+/* --- ボタン共通デザイン（四角・線画） --- */
 .btn {
     display: inline-block;
     text-decoration: none;
@@ -49,8 +49,7 @@ h1 {
     transition: all 0.2s ease;
     font-size: 0.95em;
     text-align: center;
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; /* ボタンも明朝体 */
-    border-radius: 2px; /* 角を少しだけ丸くする程度 */
+    border-radius: 0; /* 角丸なし（完全な四角） */
 }
 .btn:hover {
     background: #111;
@@ -85,13 +84,13 @@ h1 {
 }
 .timestamp-item:hover { background: #f9f9f9; }
 .timestamp-item.playing {
-    background: #e8e4df; /* テーマカラーでハイライト */
+    background: #f0eee9; /* 薄いベージュ */
     border-left: 4px solid #111;
 }
 
 .item-main { display: flex; align-items: baseline; }
 .time-badge {
-    font-family: "Courier New", monospace; /* 時間は等幅フォント */
+    font-family: "Courier New", monospace;
     font-weight: bold;
     margin-right: 15px;
     font-size: 0.9em;
@@ -101,7 +100,7 @@ h1 {
 /* メモの色分け */
 .memo-content {
     margin-top: 5px; margin-left: 60px;
-    font-size: 0.85rem; font-family: sans-serif; /* メモは見やすさ重視 */
+    font-size: 0.85rem; font-family: sans-serif;
     color: #666;
 }
 .memo-content:empty { display: none; }
@@ -120,7 +119,8 @@ h1 {
    2. モニター画面（01-screen.html）専用スタイル
    ========================================= */
 /*
-   コンセプト: 黒背景（機能性）× 明朝体UI（統一感）
+   コンセプト: 「黒板」のような機能美。
+   配色は黒×白だが、ボタン形状をトップページと揃えて「四角・細線」にする。
 */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -129,8 +129,8 @@ body.monitor-body {
     background-color: #000000;
     color: #ffffff !important;
     
-    /* UIパーツは明朝体で統一感を出す */
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    /* モニターは視認性重視でゴシック体 */
+    font-family: "Hiragino Sans", "Meiryo", sans-serif;
     
     position: fixed; top: 0; left: 0;
     width: 100%; height: 100%; height: 100dvh;
@@ -146,60 +146,58 @@ body.monitor-body {
     justify-content: center; align-items: center;
     text-align: center;
     width: 100%; min-height: 0; overflow: hidden; padding: 10px;
-    
-    /* 背景色が変わる際のトランジション */
     transition: background-color 0.3s ease;
 }
 
-/* コントロールバー：シンプルでフラットなデザインに */
+/* コントロールバー：シンプル・ミニマル */
 #controls {
     height: 90px;
     flex-shrink: 0;
     width: 100%;
-    /* 完全な黒ではなく、ごくわずかにグレーを入れて境界を意識 */
-    background: #111; 
-    border-top: 1px solid #333;
+    background: #000; /* 完全な黒 */
+    border-top: 1px solid #333; /* わずかな区切り線 */
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     z-index: 1500;
     padding-bottom: 15px; padding-top: 10px;
 }
 
-/* --- モニター画面専用ボタン --- */
-/* メイン画面の.btnを反転させたデザイン */
+/* --- モニター画面専用ボタン（トップページと同じ「四角」スタイル） --- */
 .ctrl-btn {
     flex: 1; max-width: 120px;
     background: transparent;
-    border: 1px solid #fff; /* 白枠 */
+    border: 1px solid #fff; /* 白い細枠 */
     color: #fff;
     padding: 8px 0;
     cursor: pointer;
     font-size: 0.9rem;
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; /* 明朝体 */
-    border-radius: 2px; /* 角ばらせる */
+    font-weight: normal; /* 太字にしない */
+    border-radius: 0; /* 角丸なし */
     transition: all 0.2s;
 }
 
 /* 押したとき・ホバーしたとき */
 .ctrl-btn:active, .ctrl-btn:hover {
-    background: #e8e4df; /* ここでメイン画面のベージュを使う！ */
-    color: #000;         /* 文字は黒に */
-    border-color: #e8e4df;
+    background: #fff;
+    color: #000;
 }
 
 /* 開始ボタン */
 .big-start-btn {
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     font-size: 2.5rem;
-    color: #000;
-    background-color: #e8e4df; /* ベージュ背景 */
+    font-weight: bold;
+    color: #fff;
+    background-color: transparent;
     padding: 2rem 4rem;
-    border: 1px solid #fff; /* 二重線っぽく見せる演出 */
-    outline: 5px double #e8e4df;
+    border: 2px solid #fff; /* 白枠のみ */
     cursor: pointer;
     text-align: center;
     margin-bottom: 10vh;
-    letter-spacing: 0.1em;
+    transition: 0.2s;
+}
+.big-start-btn:active {
+    background-color: #fff;
+    color: #000;
 }
 
 #start-overlay {
@@ -208,58 +206,59 @@ body.monitor-body {
     display: flex; justify-content: center; align-items: center; z-index: 9999;
 }
 
-/* 戻るボタン・全画面ボタンの配置 */
+/* ヘッダーボタン類 */
 #header-controls {
     position: fixed; top: 15px; left: 15px; right: 15px;
     display: flex; justify-content: space-between;
     z-index: 2000;
-    pointer-events: none; /* エリア自体はクリック透過 */
+    pointer-events: none;
 }
-#header-controls > * { pointer-events: auto; } /* 中身はクリック可能 */
+#header-controls > * { pointer-events: auto; }
 
 #back-to-index-btn, #fullscreen-btn {
-    background-color: transparent !important;
+    background-color: rgba(0,0,0,0.5) !important;
     color: #fff !important;
-    border: 1px solid rgba(255,255,255,0.4) !important;
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    border: 1px solid rgba(255,255,255,0.5) !important;
     padding: 6px 15px;
     font-size: 0.8rem;
     text-decoration: none;
-    border-radius: 2px;
+    border-radius: 0; /* ここも四角 */
     transition: 0.2s;
 }
 #back-to-index-btn:hover, #fullscreen-btn:hover {
     background-color: #fff !important;
     color: #000 !important;
+    border-color: #fff !important;
 }
 
-/* シークバー（シンプル化） */
+/* シークバー（ミニマル） */
 input[type=range] {
     -webkit-appearance: none; width: 90%; background: transparent; margin-bottom: 10px;
 }
 input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
-    background: #e8e4df; /* ベージュ */
-    cursor: pointer; margin-top: -6px;
+    -webkit-appearance: none; height: 12px; width: 12px;
+    background: #fff; /* 白 */
+    cursor: pointer; margin-top: -5px;
+    border-radius: 0; /* つまみも四角く */
 }
 input[type=range]::-webkit-slider-runnable-track {
-    width: 100%; height: 4px; background: #555; border-radius: 2px;
+    width: 100%; height: 2px; background: #555; border-radius: 0;
 }
 
 /* 背景色ユーティリティ */
 .bg-black { background-color: #000000 !important; }
-/* 色付き背景は少し彩度を落として「和」っぽく馴染ませる */
-.bg-red    { background-color: #8a1c1c !important; }
-.bg-blue   { background-color: #1c3d8a !important; }
-.bg-green  { background-color: #1c6b1c !important; }
-.bg-orange { background-color: #bd5900 !important; }
-.bg-purple { background-color: #5d1c8a !important; }
+/* 色付き背景は少し暗めにして文字を見やすく */
+.bg-red    { background-color: #800000 !important; }
+.bg-blue   { background-color: #002060 !important; }
+.bg-green  { background-color: #004d00 !important; }
+.bg-orange { background-color: #804000 !important; }
+.bg-purple { background-color: #4b0082 !important; }
 
 /* 準備中の点滅 */
-.bg-red-prep    { background-color: #4d0000 !important; }
-.bg-blue-prep   { background-color: #001133 !important; }
-.bg-green-prep  { background-color: #002200 !important; }
-.bg-orange-prep { background-color: #4d2200 !important; }
-.bg-purple-prep { background-color: #220033 !important; }
+.bg-red-prep    { background-color: #400000 !important; }
+.bg-blue-prep   { background-color: #001030 !important; }
+.bg-green-prep  { background-color: #002600 !important; }
+.bg-orange-prep { background-color: #402000 !important; }
+.bg-purple-prep { background-color: #250041 !important; }
 @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 .is-prep { animation: flash-prep 1.5s infinite; }
