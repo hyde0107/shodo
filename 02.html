@@ -17,14 +17,21 @@
             <div class="list-section" id="timestamp-list"></div>
         </div>
         <a href="index.html" class="btn back-link">← 戻る</a>
-</div>
+    </div>
 
-<script src="02data.js"></script>
-<script src="script.js"></script>
+    <script src="02data.js"></script>
+    <script src="script.js"></script>
 
-<script>
-    // これだけで動くようになります
-    initApp(myData, 'video-player');
-</script>
+    <script>
+        // 1. リストの初期化
+        const app = initApp(myData, 'video-player');
+        
+        // 2. 動画の再生に合わせてリストを自動スクロール・ハイライトさせる
+        const video = document.getElementById('video-player');
+        video.addEventListener('timeupdate', () => {
+            // script.js 内の updateHighlight を呼び出す
+            app.updateHighlight(video.currentTime);
+        });
+    </script>
 </body>
 </html>
