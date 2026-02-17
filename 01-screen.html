@@ -5,14 +5,48 @@
     <title>モニターPro - レイアウト修正版</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* HTML固有の微調整があればここに書くが、基本はstyle.cssへ */
+        /* HTML固有の微調整（style.cssにないもの） */
         body {
             height: 100vh;
             overflow: hidden;
             background-color: #000; /* 初期値 */
         }
+        /* モニター画面独自のレイアウト調整 */
+        #monitor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            padding-bottom: 15vh;
+            box-sizing: border-box;
+        }
+        #lyrics-guide { font-size: 3vw; color: rgba(255,255,255,0.8); margin-bottom: 2vh; height: 1.2em; font-weight: bold; }
+        #action-label { font-size: 5vw; font-weight: bold; margin-bottom: 1vh; opacity: 0.9; }
+        #name-label { font-size: 15vw; font-weight: 900; line-height: 1.1; white-space: pre-wrap; text-shadow: 2px 2px 15px rgba(0,0,0,0.5); }
+        
+        /* コントロールバー */
+        #controls { height: 120px; width: 100%; background: rgba(0,0,0,0.8); border-top: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1500; }
+        #seek-bar { width: 90%; cursor: pointer; height: 30px; }
+        .btn-row { display: flex; gap: 30px; margin-top: 5px; }
+        .ctrl-btn { background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff; padding: 8px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+
+        /* 背景色アニメーション（style.cssにある定義以外で必要な場合） */
+        @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .is-prep { animation: flash-prep 1.5s infinite; }
+        
         /* YouTubeプレーヤー非表示用 */
         #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
+        
+        /* 背景色クラス（script.jsのロジックと対応） */
+        .bg-red { background-color: #ff0000; } .bg-red-prep { background-color: #660000; }
+        .bg-blue { background-color: #007bff; } .bg-blue-prep { background-color: #002244; }
+        .bg-green { background-color: #28a745; } .bg-green-prep { background-color: #0d3316; }
+        .bg-orange { background-color: #fd7e14; } .bg-orange-prep { background-color: #663300; }
+        .bg-purple { background-color: #6f42c1; } .bg-purple-prep { background-color: #2d1a4d; }
+        .bg-black { background-color: #000; }
     </style>
 </head>
 <body>
@@ -47,8 +81,8 @@
         const seekBar = document.getElementById('seek-bar');
         const container = document.getElementById('monitor-container');
 
-        // script.jsの便利関数を使ってデータを整形
-        // performanceDataは data01.js から来る
+        // script.jsの便利関数を使って、データを扱いやすい形に変換
+        // performanceDataは data01.js から自動的に読み込まれます
         const dataSec = performanceData.map(d => ({
             s: parseTime(d[0]), // 共通関数 parseTime
             l: d[1], 
@@ -96,6 +130,7 @@
             let lastMemoIndex = -1;
             let currentLyrics = "";
 
+            // 現在の時間に対応するデータを探索
             for (let i = 0; i < dataSec.length; i++) {
                 if (currentTime >= dataSec[i].s) {
                     currentLyrics = dataSec[i].l;
@@ -108,7 +143,7 @@
             if (lastMemoIndex !== -1) {
                 let memo = dataSec[lastMemoIndex].m;
                 
-                // 共通関数 getMemoInfo で色情報を取得
+                // 共通関数 getMemoInfo で色情報を取得（重複ロジックの排除）
                 const info = getMemoInfo(memo);
                 
                 // 表示用テキストの分解
@@ -119,11 +154,11 @@
                 actionEl.innerText = action;
                 nameEl.innerText = names;
 
-                // クラスの適用
+                // 準備中フラグによる点滅
                 if (info.isPrep) container.classList.add('is-prep');
                 else container.classList.remove('is-prep');
 
-                // bodyのクラスを書き換え（共通ロジック由来）
+                // 背景色の変更（共通ロジック由来のクラス名を使用）
                 document.body.className = info.bgClass;
             }
         }
