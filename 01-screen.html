@@ -2,12 +2,13 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>モニター - 01 2026公民館</title>
+    <title>モニターPro - 歌詞・操作対応</title>
     <style>
         body {
             margin: 0;
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             font-family: "Hiragino Sans", "Meiryo", sans-serif;
@@ -17,41 +18,71 @@
             color: #fff;
         }
 
-        /* --- スタートボタン（反応を確実にするため） --- */
+        /* スタート画面 */
         #start-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #111;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
             cursor: pointer;
         }
         #start-btn {
             padding: 20px 40px;
-            font-size: 5vw;
+            font-size: 30px;
             background: #fff;
             color: #000;
             border-radius: 50px;
             font-weight: bold;
         }
 
+        /* モニター表示エリア */
         #monitor-container {
             text-align: center;
-            width: 98%;
-            display: none; /* 最初は隠しておく */
+            width: 95%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            pointer-events: none; /* 下のコントロールに干渉しないよう */
         }
 
-        #action-label { font-size: 6vw; margin-bottom: 2vh; display: block; font-weight: bold; }
-        #name-label { font-size: 16vw; font-weight: 900; display: block; line-height: 1.1; white-space: pre-wrap; }
+        #lyrics-guide { font-size: 3vw; color: rgba(255,255,255,0.7); margin-bottom: 2vh; font-style: italic; }
+        #action-label { font-size: 6vw; font-weight: bold; margin-bottom: 1vh; }
+        #name-label { font-size: 16vw; font-weight: 900; line-height: 1.1; white-space: pre-wrap; }
 
-        /* 点滅アニメーション */
-        @keyframes flash-prep { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        /* コントロールパネル */
+        #controls {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.6);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1500;
+        }
+
+        #seek-bar { width: 90%; cursor: pointer; height: 30px; }
+        .btn-row { display: flex; gap: 30px; margin-top: 10px; }
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.4); }
+
+        /* アニメーションと背景 */
+        @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .is-prep { animation: flash-prep 1.5s infinite; }
 
-        /* 背景色設定 */
         .bg-red { background-color: #ff0000; } .bg-red-prep { background-color: #660000; }
         .bg-blue { background-color: #007bff; } .bg-blue-prep { background-color: #002244; }
         .bg-green { background-color: #28a745; } .bg-green-prep { background-color: #0d3316; }
@@ -62,16 +93,25 @@
         #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
     </style>
 </head>
-<body onclick="togglePlay()">
+<body>
 
-    <div id="start-overlay" onclick="startPerformance(event)">
-        <div style="margin-bottom:20px; color:#aaa;">01 2026公民館</div>
-        <div id="start-btn">TAP TO START</div>
+    <div id="start-overlay" onclick="startPerformance()">
+        <div id="start-btn">練習を開始する</div>
     </div>
 
     <div id="monitor-container">
-        <span id="action-label" id="action-label">READY</span>
-        <span id="name-label" id="name-label">...</span>
+        <div id="lyrics-guide">（歌詞ガイド）</div>
+        <span id="action-label">READY</span>
+        <span id="name-label">...</span>
+    </div>
+
+    <div id="controls">
+        <input type="range" id="seek-bar" value="0" step="1">
+        <div class="btn-row">
+            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
+            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">PAUSE</button>
+            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
+        </div>
     </div>
     
     <div id="player-wrapper"><div id="player"></div></div>
@@ -80,81 +120,122 @@
     <script>
         const myData = [
             ["00:00", "一番きれいな色ってなんだろう？", "色①、るな・みゆ"],
+            ["00:07", "一番ひかってるものってなんだろう？", ""],
+            ["00:13", "僕は探していた 最高のGIFTを", ""],
+            ["00:20", "君が喜んだ姿をイメージしながら", ""],
             ["00:26", "♪ (Instrumental)", "スプレー準備、あん・さき"],
-            ["00:37", "「本当の自分」", "スプレー、あん・さき"],
-            ["01:25", "お世辞にも...", "大字準備、さえ・ひで"],
-            ["01:30", "「白か黒で答えろ」", "大字、さえ・ひで"],
-            ["01:42", "迷っている", "色②準備、あん・るな"],
+            ["00:37", "「本当の自分」を見つけたいって言うけど", "スプレー、あん・さき"],
+            ["00:44", "「生まれた意味」を知りたいって言うけど", ""],
+            ["00:50", "僕の両手がそれを渡す時", ""],
+            ["00:56", "ふと謎が解けるといいな 受け取ってくれるかな", ""],
+            ["01:07", "長い間 君に渡したくて", ""],
+            ["01:13", "強く握り締めていたから", ""],
+            ["01:18", "もうグジャグジャになって 色は変わり果て", ""],
+            ["01:25", "お世辞にもきれいとは言えないけど", "大字準備、さえ・ひで"],
+            ["01:30", "「白か黒で答えろ」という", "大字、さえ・ひで"],
+            ["01:35", "難題を突きつけられ", ""],
+            ["01:38", "ぶち当たった壁の前で", ""],
+            ["01:42", "僕らはまた迷っている 迷ってるけど", "色②準備、あん・るな"],
             ["01:50", "白と黒のその間に", "色②、あん・るな"],
+            ["01:55", "無限の色が広がってる", ""],
+            ["01:58", "君に似合う色探して やさしい名前をつけたなら", ""],
+            ["02:04", "ほほ 一番きれいな色", ""],
             ["02:09", "今 君に贈るよ", "決め、全員"],
-            ["02:38", "「まだ歩き続けたい」", "大字準備、さき・みゆ"],
-            ["02:47", "知らぬ間に...", "大字、さき・みゆ"],
-            ["02:58", "君の分まで...", "文字準備、あん・ひで"],
+            ["02:13", "♪ (Instrumental)", ""],
+            ["02:17", "地平線の先に辿り着いても", ""],
+            ["02:24", "新しい地平線が広がるだけ", ""],
+            ["02:30", "「もうやめにしようか？」 自分の胸に聞くと", ""],
+            ["02:38", "「まだ歩き続けたい」と返事が聞こえたよ", "大字準備、さき・みゆ"],
+            ["02:47", "知らぬ間に増えていった荷物も", "大字、さき・みゆ"],
+            ["02:53", "まだなんとか背負っていけるから", ""],
+            ["02:58", "君の分まで持つよ だからそばにいてよ", "文字準備、あん・ひで"],
             ["03:11", "果てしない旅路の果てに", "文字、あん・ひで"],
             ["03:45", "光を感じれるよ", "色③準備、みゆ・さえ"],
             ["03:53", "♪ (Instrumental)", "色③、みゆ・さえ"],
             ["03:54", "♪ (Instrumental)", "書道部文字準備、さき"],
-            ["04:04", "今 君に贈るよ", "書道部文字、さき"],
+            ["04:04", "今 君に贈るよ 気に入るかなぁ？受け取ってよ", "書道部文字、さき"],
             ["04:31", "lalalala", "大字準備、あん・ひな"],
-            ["04:47", "一番きれいな色って", "大字、あん・ひな"],
+            ["04:47", "一番きれいな色ってなんだろう？", "大字、あん・ひな"],
             ["05:30", "♪ (Instrumental)", "大字準備、るな・ひで"],
             ["05:40", "辿り着く果てまで", "大字、るな・ひで"],
-            ["05:56", "広げた腕で待っている", "文字準備、ひな・みゆ"],
+            ["05:56", "広げた腕で待っている 今", "文字準備、ひな・みゆ"],
             ["06:12", "記録を付けては体温", "文字、ひな・みゆ"],
             ["06:28", "あぁ 認めたくないな", "大字準備、あん・さき"],
             ["06:35", "辿り着く果てなんて", "大字、あん・さき"],
             ["06:56", "綺麗な花もいいけど", "色④準備、ひで・ひな"],
-            ["07:05", "(Whoa, whoa-oh-oh)", "色④、ひで・ひな"],
+            ["07:05", "(Whoa, whoa-oh-oh, whoa)", "色④、ひで・ひな"],
             ["07:15", "良い人なんかじゃないよ", "文字準備、さき・さえ"],
-            ["08:10", "遠回りする生き物", "文字準備、るな・ひな"],
+            ["08:10", "本当に我々は 遠回りする生き物", "文字準備、るな・ひな"],
             ["08:21", "嫌気がさすよ 共々", "文字、るな・ひな"],
             ["08:42", "♪ (Instrumental)", "色⑤準備、さき・さえ"],
             ["08:53", "♪ (Instrumental)", "色⑤、さき・さえ"],
-            ["09:05", "いつの日にか...", "大字準備、ひな"],
-            ["09:13", "傷をも誇れる花に", "大字、ひな"],
+            ["09:05", "いつの日にか あの朝も 消えるんだろうか", "大字準備、ひな"],
+            ["09:13", "綺麗な花もいいけど", "大字、ひな"],
             ["09:27", "意味を刻む時だ", "立ち上げ、みんな"]
         ];
 
         let player;
-        const container = document.getElementById('monitor-container');
+        const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
+        const seekBar = document.getElementById('seek-bar');
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 videoId: 'lN17WxlwdTY',
                 playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'playsinline': 1 },
-                events: { 'onReady': () => setInterval(updateMonitor, 200) }
+                events: { 'onReady': onPlayerReady }
             });
         }
 
-        // 最初の開始ボタン
-        function startPerformance(e) {
-            e.stopPropagation(); // 2重クリック防止
+        function onPlayerReady() {
+            seekBar.max = player.getDuration();
+            setInterval(updateMonitor, 200);
+            
+            // シークバー操作
+            seekBar.addEventListener('input', () => {
+                player.seekTo(seekBar.value);
+            });
+        }
+
+        function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
-            container.style.display = 'block';
             player.playVideo();
         }
 
-        // 進行中の再生・停止
         function togglePlay() {
-            if (!player || typeof player.getPlayerState !== 'function') return;
             const state = player.getPlayerState();
-            if (state === 1) player.pauseVideo();
-            else player.playVideo();
+            if (state === 1) {
+                player.pauseVideo();
+                document.getElementById('play-pause-btn').innerText = "PLAY";
+            } else {
+                player.playVideo();
+                document.getElementById('play-pause-btn').innerText = "PAUSE";
+            }
+        }
+
+        function skip(sec) {
+            player.seekTo(player.getCurrentTime() + sec);
         }
 
         function updateMonitor() {
             const currentTime = player.getCurrentTime();
+            seekBar.value = currentTime;
+            
+            let currentLyrics = "";
             let currentMemo = "";
-            const dataSec = myData.map(d => ({s: toSeconds(d[0]), m: d[2]}));
+            
+            const dataSec = myData.map(d => ({s: toSeconds(d[0]), l: d[1], m: d[2]}));
             
             for (let i = 0; i < dataSec.length; i++) {
                 if (currentTime >= dataSec[i].s && (!dataSec[i+1] || currentTime < dataSec[i+1].s)) {
+                    currentLyrics = dataSec[i].l;
                     currentMemo = dataSec[i].m;
                     break;
                 }
             }
+
+            lyricsEl.innerText = currentLyrics || "♪ (Instrumental)";
 
             if (currentMemo) {
                 let parts = currentMemo.split(/[、]/);
@@ -165,8 +246,8 @@
                 actionEl.innerText = action;
                 nameEl.innerText = names;
 
-                if (isPrep) container.classList.add('is-prep');
-                else container.classList.remove('is-prep');
+                if (isPrep) document.getElementById('monitor-container').classList.add('is-prep');
+                else document.getElementById('monitor-container').classList.remove('is-prep');
 
                 let base = "purple";
                 if (currentMemo.includes("大字")) base = "red";
@@ -182,7 +263,7 @@
 
         function toSeconds(t) {
             const p = t.split(':').reverse();
-            return parseInt(p[0]) + (parseInt(p[1]) * 60);
+            return parseInt(p[0]) + (parseInt(p[1] || 0) * 60);
         }
     </script>
 </body>
