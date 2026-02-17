@@ -33,15 +33,21 @@
     <div id="player-wrapper"><div id="player"></div></div>
 
     <script src="01data.js"></script>
+    <script src="script.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
+
     <script>
         let player;
-        const lyricsEl = document.getElementById('lyrics-guide');
-        const actionEl = document.getElementById('action-label');
-        const nameEl = document.getElementById('name-label');
         const seekBar = document.getElementById('seek-bar');
-        const container = document.getElementById('monitor-container');
         const sBtn = document.getElementById('start-btn');
+        
+        // script.jsの updateMonitorUI 関数に渡すための要素リスト
+        const elements = {
+            lyricsEl: document.getElementById('lyrics-guide'),
+            actionEl: document.getElementById('action-label'),
+            nameEl: document.getElementById('name-label'),
+            container: document.getElementById('monitor-container')
+        };
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
@@ -55,7 +61,16 @@
             seekBar.max = player.getDuration();
             sBtn.innerText = "練習を開始する";
             sBtn.classList.add('ready');
-            setInterval(updateMonitor, 200);
+
+            // 共通ロジック(updateMonitorUI)を呼び出すループ
+            setInterval(() => {
+                const currentTime = player.getCurrentTime();
+                seekBar.value = currentTime;
+                
+                // --- script.js にまとめた関数を呼び出すだけ！ ---
+                updateMonitorUI(currentTime, myData, elements);
+            }, 200);
+
             seekBar.addEventListener('input', () => player.seekTo(seekBar.value));
         }
 
@@ -67,7 +82,7 @@
 
         function togglePlay() {
             const state = player.getPlayerState();
-            if (state === 1) {
+            if (state === 1) { // 再生中
                 player.pauseVideo();
                 document.getElementById('play-pause-btn').innerText = "PLAY";
             } else {
@@ -86,50 +101,6 @@
             } else {
                 if (document.exitFullscreen) document.exitFullscreen();
             }
-        }
-
-        function updateMonitor() {
-            const currentTime = player.getCurrentTime();
-            seekBar.value = currentTime;
-            
-            let lastMemoIndex = -1;
-            let currentLyrics = "";
-            const dataSec = myData.map(d => ({s: toSeconds(d[0]), l: d[1], m: d[2]}));
-            
-            for (let i = 0; i < dataSec.length; i++) {
-                if (currentTime >= dataSec[i].s) {
-                    currentLyrics = dataSec[i].l;
-                    if (dataSec[i].m && dataSec[i].m.trim() !== "") lastMemoIndex = i;
-                } else break;
-            }
-
-            lyricsEl.innerText = currentLyrics || "";
-
-            if (lastMemoIndex !== -1) {
-                let memo = dataSec[lastMemoIndex].m;
-                let parts = memo.split(/[、]/);
-                let action = parts[0] || "";
-                let names = (parts[1] || "").replace(/・/g, '\n');
-                let isPrep = action.includes("準備");
-
-                actionEl.innerText = action;
-                nameEl.innerText = names;
-
-                if (isPrep) container.classList.add('is-prep');
-                else container.classList.remove('is-prep');
-
-                let base = "purple";
-                if (memo.includes("大字")) base = "red";
-                else if (memo.includes("色")) base = "blue";
-                else if (memo.includes("文字")) base = "green";
-                else if (memo.includes("スプレー")) base = "orange";
-                document.body.className = "bg-" + base + (isPrep ? "-prep" : "");
-            }
-        }
-
-        function toSeconds(t) {
-            const p = t.split(':').reverse();
-            return parseInt(p[0]) + (parseInt(p[1] || 0) * 60);
         }
     </script>
 </body>
