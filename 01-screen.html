@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>モニターPro - レイアウト修正版</title>
+    <title>モニターPro - フルスクリーン対応</title>
     <style>
         body {
             margin: 0;
@@ -30,22 +30,20 @@
         #start-btn {
             padding: 20px 40px;
             font-size: 24px;
-            background: #fff;
-            color: #000;
-            border-radius: 50px;
-            font-weight: bold;
+            background: #fff; color: #000;
+            border-radius: 50px; font-weight: bold;
         }
 
-        /* --- メイン表示エリア（ここを上に寄せる） --- */
+        /* メイン表示エリア */
         #monitor-container {
-            flex: 1; /* 残りの空間をすべて使う */
+            flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* 中央やや上に配置 */
+            justify-content: center;
             align-items: center;
             text-align: center;
             width: 100%;
-            padding-bottom: 15vh; /* 下部の操作バーとのマージンを強制確保 */
+            padding-bottom: 120px; /* 操作バーの高さ分を確保 */
             box-sizing: border-box;
         }
 
@@ -53,29 +51,19 @@
             font-size: 3vw; 
             color: rgba(255,255,255,0.8); 
             margin-bottom: 2vh;
-            height: 1.2em;
+            min-height: 1.2em;
             font-weight: bold;
         }
-        #action-label { 
-            font-size: 5vw; 
-            font-weight: bold; 
-            margin-bottom: 1vh;
-            opacity: 0.9;
-        }
-        #name-label { 
-            font-size: 15vw; /* 少しだけ小さくして確実に収める */
-            font-weight: 900; 
-            line-height: 1.1; 
-            white-space: pre-wrap;
-            text-shadow: 2px 2px 15px rgba(0,0,0,0.5);
-        }
+        #action-label { font-size: 5vw; font-weight: bold; margin-bottom: 1vh; }
+        #name-label { font-size: 15vw; font-weight: 900; line-height: 1.1; white-space: pre-wrap; }
 
-        /* --- 操作パネル（画面下部に固定） --- */
+        /* 操作パネル */
         #controls {
-            height: 120px; /* 高さを固定 */
+            position: fixed;
+            bottom: 0;
+            height: 120px;
             width: 100%;
             background: rgba(0,0,0,0.8);
-            border-top: 1px solid rgba(255,255,255,0.2);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -91,14 +79,30 @@
             color: #fff;
             padding: 8px 25px;
             border-radius: 8px;
-            cursor: pointer;
             font-size: 16px;
+            cursor: pointer;
         }
 
-        /* 背景色とアニメーション（これまでのロジックを継承） */
+        /* フルスクリーンボタン（右下に小さく） */
+        #fs-btn {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1600;
+        }
+
+        /* 準備中のアニメーション */
         @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .is-prep { animation: flash-prep 1.5s infinite; }
 
+        /* 背景色 */
         .bg-red { background-color: #ff0000; } .bg-red-prep { background-color: #660000; }
         .bg-blue { background-color: #007bff; } .bg-blue-prep { background-color: #002244; }
         .bg-green { background-color: #28a745; } .bg-green-prep { background-color: #0d3316; }
@@ -129,17 +133,16 @@
             <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
         </div>
     </div>
+
+    <button id="fs-btn" onclick="toggleFullScreen()">[ ] 全画面</button>
     
     <div id="player-wrapper"><div id="player"></div></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        // myDataは前回のものをそのまま使用
+        // myDataは前回の全データをそのまま継承してください
         const myData = [
             ["00:00", "一番きれいな色ってなんだろう？", "色①、るな・みゆ"],
-            ["00:07", "一番ひかってるものってなんだろう？", ""],
-            ["00:13", "僕は探していた 最高のGIFTを", ""],
-            ["00:20", "君が喜んだ姿をイメージしながら", ""],
             ["00:26", "♪ (Instrumental)", "スプレー準備、あん・さき"],
             ["00:37", "「本当の自分」を...", "スプレー、あん・さき"],
             ["01:25", "お世辞にも...", "大字準備、さえ・ひで"],
@@ -171,7 +174,7 @@
             ["08:42", "♪ (Instrumental)", "色⑤準備、さき・さえ"],
             ["08:53", "♪ (Instrumental)", "色⑤、さき・さえ"],
             ["09:05", "いつの日にか...", "大字準備、ひな"],
-            ["09:13", "綺麗な花もいいけど", "大字、ひな"],
+            ["09:13", "綺麗な花もいいけど", "大字,ひな"],
             ["09:27", "意味を刻む時だ", "立ち上げ、みんな"]
         ];
 
@@ -214,6 +217,17 @@
 
         function skip(sec) {
             player.seekTo(player.getCurrentTime() + sec);
+        }
+
+        // フルスクリーン切り替え
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
         }
 
         function updateMonitor() {
