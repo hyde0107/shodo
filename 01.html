@@ -18,19 +18,37 @@
     <script src="01data.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
+
     <script>
-        // myData = [...] の部分はまるごと消してOKです！
         let player;
         let app;
+
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 videoId: 'lN17WxlwdTY',
-                events: { 'onReady': () => {
-                    window.player = player;
-                    app = initApp(myData, null); // ここで data.js の中身が使われる
-                    setInterval(() => app.updateHighlight(player.getCurrentTime()), 500);
-                }}
+                playerVars: {
+                    'rel': 0,
+                    'playsinline': 1
+                },
+                events: { 
+                    'onReady': onPlayerReady 
+                }
             });
+        }
+
+        function onPlayerReady() {
+            // script.jsでクリック操作ができるようにwindowにプレイヤーを登録
+            window.player = player;
+
+            // リストの生成（myDataは01data.jsから取得）
+            app = initApp(myData, null); 
+
+            // 500msごとに再生位置をチェックしてリストを光らせる
+            setInterval(() => {
+                if (player && player.getCurrentTime) {
+                    app.updateHighlight(player.getCurrentTime());
+                }
+            }, 500);
         }
     </script>
 </body>
