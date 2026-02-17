@@ -27,122 +27,88 @@ h1 {
     text-align: center;
 }
 
-/* --- トップページ専用：カードレイアウト --- */
+/* --- トップページ：カードデザインの修正 --- */
 .container { 
     display: flex; 
     justify-content: center; 
-    gap: 20px; 
+    gap: 30px; 
     flex-wrap: wrap; 
     width: 100%;
+    margin-bottom: 50px;
 }
 
-.card {
+/* aタグにcardクラスがついている場合のスタイル */
+a.card {
     background: #fff; 
     border: 1px solid #000; 
     width: 280px; 
     padding: 30px;
-    text-decoration: none; 
+    text-decoration: none; /* 下線を消す */
     color: #000; 
+    display: block; /* 領域全体をクリック可能に */
     transition: 0.3s; 
     position: relative;
-    box-sizing: border-box; /* サイズ崩れ防止 */
+    box-sizing: border-box;
+    text-align: left; /* テキストを左寄せに */
 }
 
-.card:hover { 
+a.card:hover { 
     transform: translateY(-5px); 
     box-shadow: 10px 10px 0 #000; 
 }
 
 .card h2 { 
     font-size: 1.4em; 
-    margin: 0 0 15px; 
+    margin: 0 0 10px; 
     border-left: 5px solid #000; 
     padding-left: 10px; 
+    color: #000;
+}
+
+.card p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #333;
 }
 
 .hanko {
     border: 2px solid #a40000; 
     color: #a40000; 
-    width: 50px; 
-    height: 50px;
+    width: 55px; 
+    height: 55px;
     display: flex; 
     align-items: center; 
     justify-content: center;
     font-weight: bold; 
     font-size: 0.8em; 
+    margin-top: 10px;
     margin-left: auto; 
     transform: rotate(-10deg);
     border-radius: 50%;
 }
 
-/* --- 解析ページ専用：プレイヤー＆リスト --- */
-.app-container { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 20px; 
-    width: 100%; 
-}
-
+/* --- 解析ページ用設定（01.html/02.html） --- */
+.app-container { display: flex; flex-wrap: wrap; gap: 20px; width: 100%; }
 .player-section { flex: 1.2; min-width: 320px; }
-.video-container { 
-    width: 100%; 
-    aspect-ratio: 16 / 9; 
-    background: #000; 
-    border: 1px solid #000; 
-}
+.video-container { width: 100%; aspect-ratio: 16 / 9; background: #000; border: 1px solid #000; }
+.list-section { flex: 0.8; min-width: 320px; background: #fff; border: 1px solid #000; max-height: 70vh; overflow-y: auto; }
 
-.list-section { 
-    flex: 0.8; 
-    min-width: 320px; 
-    background: #fff; 
-    border: 1px solid #000; 
-    max-height: 70vh; 
-    overflow-y: auto; 
-}
+/* タイムスタンプ項目のデザイン */
+.timestamp-item { display: flex; flex-direction: column; padding: 12px 10px; border-bottom: 1px solid #eee; cursor: pointer; border-left: 4px solid transparent; }
+.timestamp-item.playing { background: #eef6ff; border-left: 4px solid #007bff; font-weight: bold; }
+.time-badge { background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; margin-right: 12px; border-radius: 4px; }
 
-.timestamp-item { 
-    display: flex; 
-    flex-direction: column; 
-    padding: 12px 10px; 
-    border-bottom: 1px solid #eee; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    border-left: 4px solid transparent;
-}
-
-.timestamp-item.playing { 
-    background: #eef6ff; 
-    border-left: 4px solid #007bff; 
-    font-weight: bold; 
-}
-
-.time-badge { 
-    background: #000; 
-    color: #fff; 
-    padding: 2px 8px; 
-    font-size: 0.8em; 
-    margin-right: 12px; 
-    border-radius: 4px; 
-}
-
-/* --- メモの色分け（解析ページ用） --- */
-.memo-content {
-    margin-top: 5px;
-    margin-left: 55px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #666; /* デフォルト色 */
-}
-
+/* メモの色分け */
+.memo-content { margin-top: 5px; margin-left: 55px; font-size: 0.85rem; font-weight: bold; color: #666; }
 .memo-content:empty { display: none; }
+.memo-color-1 { color: #d9534f !important; } /* 赤 */
+.memo-color-2 { color: #007bff !important; } /* 青 */
+.memo-color-3 { color: #28a745 !important; } /* 緑 */
+.memo-color-4 { color: #fd7e14 !important; } /* 橙 */
+.memo-color-5 { color: #6f42c1 !important; } /* 紫 */
 
-.memo-color-1 { color: #d9534f !important; } /* 赤：大字 */
-.memo-color-2 { color: #007bff !important; } /* 青：色 */
-.memo-color-3 { color: #28a745 !important; } /* 緑：文字 */
-.memo-color-4 { color: #fd7e14 !important; } /* 橙：スプレー */
-.memo-color-5 { color: #6f42c1 !important; } /* 紫：その他 */
-
-/* --- その他ボタン類 --- */
+/* --- 管理者用フッター --- */
+.admin-footer { margin-top: 50px; padding-top: 30px; border-top: 1px solid #ccc; width: 100%; text-align: center; }
 .btn {
     display: inline-block;
     text-decoration: none;
@@ -150,11 +116,7 @@ h1 {
     border: 1px solid #000;
     padding: 8px 20px;
     background: #fff;
-    cursor: pointer;
+    margin: 5px;
     transition: 0.3s;
-    font-size: 0.9em;
 }
-
 .btn:hover { background: #000; color: #fff; }
-
-.admin-footer { margin-top: 80px; width: 100%; text-align: center; border-top: 1px solid #ccc; padding-top: 20px; }
