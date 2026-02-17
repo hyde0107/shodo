@@ -2,81 +2,47 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>データエディタ</title>
+    <title>一括変換ツール</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="page-wrapper">
-        <h1>歌詞データ エディタ</h1>
+        <h1>一括変換ツール</h1>
         <div class="admin-box">
-            <h3>1. 歌詞を貼り付け (00:00 歌詞)</h3>
-            <textarea id="rawInput"></textarea>
-            <button class="btn" onclick="importText()">表に反映する</button>
-
-            <table class="admin-table">
-                <thead>
-                    <tr><th>時間</th><th>歌詞</th><th>メモ</th><th>削除</th></tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-
-            <div style="margin-top:20px; display:flex; gap:10px;">
-                <button class="btn" onclick="addRow()">＋ 行を追加</button>
-                <button class="btn btn-red" onclick="generateCode()">コードを生成</button>
-            </div>
-            <div id="output"></div>
+            <p>SRTファイルや歌詞テキストを貼り付けてください</p>
+            <textarea id="inputText" placeholder="01:20 歌詞のように入力"></textarea>
+            <button class="btn btn-red" style="width:100%" onclick="convert()">コードを生成する</button>
+            <pre id="result"></pre>
         </div>
         <a href="index.html" class="btn back-link">← 戻る</a>
     </div>
 
     <script>
-        function addRow(time = "", text = "", memo = "") {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input type="text" class="t-time" value="${time}" placeholder="00:00"></td>
-                <td><input type="text" class="t-text" value="${text}"></td>
-                <td><input type="text" class="t-memo" value="${memo}" placeholder="例: 大字、名前"></td>
-                <td><button class="delete-btn" onclick="this.parentElement.parentElement.remove()">×</button></td>
-            `;
-            document.getElementById('tableBody').appendChild(tr);
-        }
-
-        // インポート時、既存の表をクリアするか選べると便利なので少し強化
-        function importText() {
-            const input = document.getElementById('rawInput').value.trim();
+        function convert() {
+            const input = document.getElementById('inputText').value.trim();
             if (!input) return;
-            
-            const lines = input.split('\n');
-            lines.forEach(line => {
-                const match = line.match(/(\d{1,2}:\d{2})[\s　]+(.*)/);
-                if (match) addRow(match[1], match[2], "");
-            });
-            document.getElementById('rawInput').value = "";
-        }
-
-        function generateCode() {
-            const rows = document.querySelectorAll('#tableBody tr');
-            if (rows.length === 0) return;
-
-            let dataLines = [];
-            rows.forEach(row => {
-                const time = row.querySelector('.t-time').value.trim();
-                const text = row.querySelector('.t-text').value.trim();
-                const memo = row.querySelector('.t-memo').value.trim();
-                if (time || text) {
-                    dataLines.push(`  ["${time}", "${text}", "${memo}"]`);
-                }
-            });
-
-            const code = "const myData = [\n" + dataLines.join(",\n") + "\n];";
-            const out = document.getElementById('output');
-            out.textContent = code;
-            out.style.display = "block";
-
-            // クリップボードに自動コピー（追加機能）
-            navigator.clipboard.writeText(code).then(() => {
-                alert("コードを生成し、クリップボードにコピーしました！\nそのままdata.jsに貼り付けられます。");
-            });
+            let resultArray = [];
+            if (input.includes('-->')) { // SRT形式
+                const blocks = input.split(/\n\s*\n/);
+                blocks.forEach(block => {
+                    const lines = block.split('\n');
+                    const timeMatch = block.match(/(\d{2}):(\d{2}):(\d{2})/);
+                    if (timeMatch) {
+                        const timeStr = `${timeMatch[2]}:${timeMatch[3]}`;
+                        const text = lines.slice(2).join(' ').trim();
+                        if (text && text !== '♪') resultArray.push(`  ["${timeStr}", "${text}", ""]`);
+                    }
+                });
+            } else { // 自由形式
+                const lines = input.split('\n');
+                lines.forEach(line => {
+                    const match = line.match(/(\d{1,2}:\d{2})\s+(.*)/);
+                    if (match) resultArray.push(`  ["${match[1]}", "${match[2]}", ""]`);
+                });
+            }
+            const output = document.getElementById('result');
+            output.textContent = `const myData = [\n${resultArray.join(',\n')}\n];`;
+            output.style.display = "block";
         }
     </script>
 </body>
