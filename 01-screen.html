@@ -7,35 +7,45 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* --- 全体のベース --- */
         body.monitor-body {
             background-color: #111;
             color: #fff;
             font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             width: 100vw;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            transition: background 0.5s ease;
+            transition: background 0.3s ease;
         }
 
-        /* --- 背景色のグラデーション --- */
+        /* --- 背景色 --- */
         .bg-black { background: radial-gradient(circle at center, #333 0%, #000 100%); }
-        .bg-red   { background: linear-gradient(135deg, #b31217 0%, #570000 100%); }
-        .bg-blue  { background: linear-gradient(135deg, #005bea 0%, #002266 100%); }
-        .bg-green { background: linear-gradient(135deg, #134e5e 0%, #082823 100%); }
-        .bg-orange{ background: linear-gradient(135deg, #ff9966 0%, #cc3300 100%); }
-        .bg-purple{ background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); }
-        .is-prep  { border: 20px solid #ffcc00; }
+        .bg-red   { background: linear-gradient(135deg, #8a0000 0%, #3d0000 100%); }
+        .bg-blue  { background: linear-gradient(135deg, #003399 0%, #001133 100%); }
+        .bg-green { background: linear-gradient(135deg, #004d40 0%, #00251f 100%); }
+        .bg-orange{ background: linear-gradient(135deg, #cc4400 0%, #662200 100%); }
+        .bg-purple{ background: linear-gradient(135deg, #5500aa 0%, #220044 100%); }
 
-        /* --- メイン表示エリア --- */
+        /* --- 【新機能】準備モード（黄色い警告） --- */
+        @keyframes warning-flash {
+            0% { border-color: #ffcc00; box-shadow: inset 0 0 50px rgba(255, 204, 0, 0.5); }
+            50% { border-color: #000; box-shadow: inset 0 0 0px rgba(0,0,0,0); }
+            100% { border-color: #ffcc00; box-shadow: inset 0 0 50px rgba(255, 204, 0, 0.5); }
+        }
+        body.monitor-body.warning-mode {
+            border: 20px solid #ffcc00;
+            animation: warning-flash 1.0s infinite;
+        }
+
+        /* --- メインエリア --- */
         #monitor-container {
             text-align: center;
             width: 100%;
-            padding: 20px;
+            padding: 80px 20px 20px;
+            margin: auto;
             z-index: 10;
         }
 
@@ -43,10 +53,8 @@
         #lyrics-guide { 
             font-family: "Hiragino Mincho ProN", serif;
             font-size: 3.5vmin;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.6);
             margin-bottom: 2vh;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-            letter-spacing: 0.1em;
             min-height: 1.5em;
         }
 
@@ -55,75 +63,76 @@
             display: inline-block;
             font-size: 6vmin;
             font-weight: 900; 
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
             padding: 0.2em 1em;
             border-radius: 50px;
-            border: 2px solid rgba(255,255,255,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
             margin-bottom: 2vh;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            letter-spacing: 0.1em;
         }
 
         /* 名前表示 */
         #name-label { 
             display: block;
             font-size: 14vmin;
-            font-weight: 900;
+            font-weight: 900; 
             line-height: 1.1; 
             white-space: pre-wrap; 
             text-shadow: 0px 5px 15px rgba(0,0,0,0.8);
             width: 100%;
             transition: all 0.3s;
         }
-        /* 名前が2行になった時 */
-        #name-label.two-lines-mode {
-            font-size: 10vmin !important;
-            line-height: 1.2;
+        #name-label.two-lines-mode { font-size: 10vmin !important; line-height: 1.2; }
+
+        /* --- 【新機能】次アクション予告エリア --- */
+        #next-alert {
+            margin-top: 5vh;
+            padding: 15px 30px;
+            background: rgba(255, 204, 0, 0.9);
+            color: #000;
+            font-weight: bold;
+            font-size: 4vmin;
+            border-radius: 10px;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+        }
+        body.monitor-body.warning-mode #next-alert {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        /* --- UIパーツ --- */
+        /* --- その他UI --- */
         #header-controls {
             position: absolute; top: 10px; left: 10px; right: 10px;
             display: flex; justify-content: space-between; z-index: 100;
         }
         #back-to-index-btn, #fullscreen-btn {
-            background: rgba(0,0,0,0.5);
-            color: #fff; border: 1px solid #777;
-            padding: 8px 12px; text-decoration: none; font-size: 14px; border-radius: 4px;
-            cursor: pointer;
+            background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #777;
+            padding: 8px 12px; text-decoration: none; font-size: 14px; border-radius: 4px; cursor: pointer;
         }
-
         #controls {
             position: fixed; bottom: 20px; left: 0; width: 100%;
             display: flex; flex-direction: column; align-items: center; gap: 10px;
             z-index: 100; opacity: 0; transition: opacity 0.3s;
         }
         body:hover #controls { opacity: 1; }
-
         input[type=range] { width: 80%; max-width: 600px; accent-color: #fff; cursor: pointer; }
         .btn-row { display: flex; gap: 20px; }
         .ctrl-btn {
             background: rgba(255,255,255,0.2); border: 1px solid #fff; color: #fff;
             padding: 10px 20px; font-size: 16px; border-radius: 30px; cursor: pointer;
         }
-        .ctrl-btn:active { background: #fff; color: #000; }
-
-        /* 開始オーバーレイ */
         #start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 999; cursor: pointer;
+            background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 999;
         }
         .big-start-btn {
-            border: 3px solid #fff; padding: 40px 60px;
-            font-size: 3rem; font-weight: bold; color: #fff;
-            border-radius: 10px; text-align: center;
-            background: rgba(255,255,255,0.1);
-            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+            border: 3px solid #fff; padding: 40px 60px; font-size: 3rem; font-weight: bold; color: #fff;
+            border-radius: 10px; background: rgba(255,255,255,0.1);
         }
-
-        /* YouTubeプレーヤー隠し場所 (透明・操作不可) */
         #player-wrapper { position: fixed; top:0; left:0; width:1px; height:1px; opacity:0; pointer-events:none; z-index:-1; }
     </style>
 </head>
@@ -135,10 +144,7 @@
     </div>
 
     <div id="start-overlay" onclick="startPerformance()">
-        <div class="big-start-btn">
-            Tap to Start<br>
-            <span style="font-size:1rem; font-weight:normal; display:block; margin-top:15px; opacity:0.7;">練習開始</span>
-        </div>
+        <div class="big-start-btn">Tap to Start</div>
     </div>
 
     <div id="monitor-container">
@@ -146,6 +152,8 @@
         <span id="action-label">READY</span>
         <br>
         <span id="name-label">...</span>
+        <br>
+        <div id="next-alert">NEXT: ???</div>
     </div>
 
     <div id="controls">
@@ -163,24 +171,21 @@
     <script src="data01.js"></script>
 
     <script>
-        // --- 変数定義 ---
         let player;
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
+        const nextAlertEl = document.getElementById('next-alert');
         const seekBar = document.getElementById('seek-bar');
-        const container = document.getElementById('monitor-container');
 
-        // データ読み込みチェック
         let dataSec = [];
-        // data01.js は performanceData という変数名で定義されている前提
-        if (typeof performanceData === 'undefined') {
-            alert("data01.js が読み込めません！");
-            nameEl.innerText = "DATA ERROR";
-        } else {
+        if (typeof performanceData !== 'undefined') {
             dataSec = performanceData.map(d => ({
                 s: parseTime(d[0]), l: d[1], m: d[2]
             }));
+        } else {
+            alert("data01.js が読み込めません！");
+            nameEl.innerText = "DATA ERROR";
         }
 
         function parseTime(timeStr) {
@@ -189,31 +194,25 @@
             return parseInt(parts[0]) * 60 + parseInt(parts[1]);
         }
 
-        // --- 色判定ロジック ---
         function getMemoInfo(memo) {
             let bgClass = "bg-black";
-            let isPrep = false;
-            if (!memo) return { bgClass, isPrep };
+            if (!memo) return { bgClass };
             
             if (memo.includes("大字")) bgClass = "bg-red";
-            else if (memo.includes("絵")) bgClass = "bg-blue";
-            else if (memo.includes("めくる")) bgClass = "bg-blue";
-            else if (memo.includes("板")) bgClass = "bg-green";
-            else if (memo.includes("色")) bgClass = "bg-orange";
-            else if (memo.includes("退場")) bgClass = "bg-purple";
+            else if (memo.includes("絵") || memo.includes("めくる") || memo.includes("青")) bgClass = "bg-blue";
+            else if (memo.includes("板") || memo.includes("緑")) bgClass = "bg-green";
+            else if (memo.includes("色") || memo.includes("橙")) bgClass = "bg-orange";
+            else if (memo.includes("退場") || memo.includes("紫")) bgClass = "bg-purple";
             else if (memo.includes("赤")) bgClass = "bg-red";
-            else if (memo.includes("青")) bgClass = "bg-blue";
-            else if (memo.includes("準備")) {
-                isPrep = true;
-                bgClass = "bg-black";
-            }
-            return { bgClass, isPrep };
+            // 準備という言葉自体が含まれていたらデフォルトで黒にする
+            else if (memo.includes("準備")) bgClass = "bg-black";
+            
+            return { bgClass };
         }
 
-        // --- YouTube API 設定 ---
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                videoId: 'lN17WxlwdTY', // 公民館の動画ID
+                videoId: 'lN17WxlwdTY',
                 playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'playsinline': 1 },
                 events: { 'onReady': onPlayerReady }
             });
@@ -221,15 +220,10 @@
 
         function onPlayerReady() {
             seekBar.max = player.getDuration();
-            setInterval(updateMonitor, 100); // 0.1秒ごとに更新
-            
-            // シークバー操作
-            seekBar.addEventListener('input', () => {
-                player.seekTo(seekBar.value);
-            });
+            setInterval(updateMonitor, 100);
+            seekBar.addEventListener('input', () => { player.seekTo(seekBar.value); });
         }
 
-        // --- コントロール関数 ---
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
             if (player && player.playVideo) {
@@ -237,88 +231,92 @@
                 document.getElementById('play-pause-btn').innerText = "PAUSE";
             }
         }
-
         function togglePlay() {
             if (!player || !player.getPlayerState) return;
             const state = player.getPlayerState();
             const btn = document.getElementById('play-pause-btn');
-            
-            if (state === 1) { // 再生中
-                player.pauseVideo();
-                btn.innerText = "PLAY";
-            } else {
-                player.playVideo();
-                btn.innerText = "PAUSE";
-            }
+            if (state === 1) { player.pauseVideo(); btn.innerText = "PLAY"; }
+            else { player.playVideo(); btn.innerText = "PAUSE"; }
         }
-
-        function skip(sec) {
-            if (player && player.getCurrentTime) {
-                player.seekTo(player.getCurrentTime() + sec);
-            }
-        }
-
+        function skip(sec) { if (player) player.seekTo(player.getCurrentTime() + sec); }
         function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-                else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
         }
 
-        // --- メイン画面更新ロジック ---
         function updateMonitor() {
             if (!player || !player.getCurrentTime) return;
-            
             const currentTime = player.getCurrentTime();
             if(document.activeElement !== seekBar) seekBar.value = currentTime;
             
-            let lastMemoIndex = -1;
+            // --- 1. 現在の表示 ---
+            let currentIndex = -1;
             let currentLyrics = "";
-
             for (let i = 0; i < dataSec.length; i++) {
                 if (currentTime >= dataSec[i].s) {
                     currentLyrics = dataSec[i].l;
-                    if (dataSec[i].m && dataSec[i].m.trim() !== "") lastMemoIndex = i;
+                    if (dataSec[i].m && dataSec[i].m.trim() !== "") currentIndex = i;
                 } else break;
             }
 
             lyricsEl.innerText = currentLyrics || "";
+            let bgClass = "bg-black";
 
-            if (lastMemoIndex !== -1) {
-                let memo = dataSec[lastMemoIndex].m;
+            if (currentIndex !== -1) {
+                let memo = dataSec[currentIndex].m;
                 const info = getMemoInfo(memo);
-                
+                bgClass = info.bgClass;
+
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
-                
-                // 名前リスト処理
                 let nameStr = (parts[1] || "").trim();
                 let names = "";
                 
                 if (nameStr) {
                     let nameList = nameStr.split('・');
                     if (nameList.length >= 3) {
-                        // 3人以上は2行に
                         let half = Math.ceil(nameList.length / 2);
                         names = nameList.slice(0, half).join('・') + "\n" + nameList.slice(half).join('・');
                         nameEl.classList.add('two-lines-mode');
                     } else {
-                        // 2人以下は1行 (改行区切り)
                         names = nameList.join('\n');
                         nameEl.classList.remove('two-lines-mode');
                     }
                 }
-
                 actionEl.innerText = action;
                 nameEl.innerText = names;
+            }
 
-                if (info.isPrep) document.body.classList.add('is-prep');
-                else document.body.classList.remove('is-prep');
+            // --- 2. 次アクション予告＆警告 ---
+            let nextIndex = -1;
+            for (let i = 0; i < dataSec.length; i++) {
+                if (dataSec[i].s > currentTime && dataSec[i].m && dataSec[i].m.trim() !== "") {
+                    nextIndex = i;
+                    break;
+                }
+            }
 
-                document.body.className = "monitor-body " + info.bgClass + (info.isPrep ? " is-prep" : "");
+            let isWarning = false;
+            if (nextIndex !== -1) {
+                const nextItem = dataSec[nextIndex];
+                const timeLeft = nextItem.s - currentTime;
+
+                // 8秒前からカウントダウン開始
+                if (timeLeft <= 8 && timeLeft > 0) {
+                    isWarning = true;
+                    let nextParts = nextItem.m.split(/[、]/);
+                    let nextAction = nextParts[0]; 
+                    nextAlertEl.innerText = `NEXT: ${nextAction} (${timeLeft.toFixed(1)})`;
+                }
+            }
+
+            // 警告モード適用
+            if (isWarning) {
+                document.body.classList.add('warning-mode');
+                document.body.className = `monitor-body ${bgClass} warning-mode`;
+            } else {
+                document.body.classList.remove('warning-mode');
+                document.body.className = `monitor-body ${bgClass}`;
             }
         }
     </script>
