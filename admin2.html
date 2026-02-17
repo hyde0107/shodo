@@ -35,17 +35,20 @@
             tr.innerHTML = `
                 <td><input type="text" class="t-time" value="${time}" placeholder="00:00"></td>
                 <td><input type="text" class="t-text" value="${text}"></td>
-                <td><input type="text" class="t-memo" value="${memo}"></td>
-                <td><button onclick="this.parentElement.parentElement.remove()">×</button></td>
+                <td><input type="text" class="t-memo" value="${memo}" placeholder="例: 大字、名前"></td>
+                <td><button class="delete-btn" onclick="this.parentElement.parentElement.remove()">×</button></td>
             `;
             document.getElementById('tableBody').appendChild(tr);
         }
 
+        // インポート時、既存の表をクリアするか選べると便利なので少し強化
         function importText() {
             const input = document.getElementById('rawInput').value.trim();
+            if (!input) return;
+            
             const lines = input.split('\n');
             lines.forEach(line => {
-                const match = line.match(/(\d{1,2}:\d{2})\s+(.*)/);
+                const match = line.match(/(\d{1,2}:\d{2})[\s　]+(.*)/);
                 if (match) addRow(match[1], match[2], "");
             });
             document.getElementById('rawInput').value = "";
@@ -53,18 +56,27 @@
 
         function generateCode() {
             const rows = document.querySelectorAll('#tableBody tr');
-            let code = "const myData = [\n";
+            if (rows.length === 0) return;
+
+            let dataLines = [];
             rows.forEach(row => {
-                const time = row.querySelector('.t-time').value;
-                const text = row.querySelector('.t-text').value;
-                const memo = row.querySelector('.t-memo').value;
-                code += `  ["${time}", "${text}", "${memo}"],\n`;
+                const time = row.querySelector('.t-time').value.trim();
+                const text = row.querySelector('.t-text').value.trim();
+                const memo = row.querySelector('.t-memo').value.trim();
+                if (time || text) {
+                    dataLines.push(`  ["${time}", "${text}", "${memo}"]`);
+                }
             });
-            code += "];";
+
+            const code = "const myData = [\n" + dataLines.join(",\n") + "\n];";
             const out = document.getElementById('output');
             out.textContent = code;
             out.style.display = "block";
-            alert("コードを生成しました！");
+
+            // クリップボードに自動コピー（追加機能）
+            navigator.clipboard.writeText(code).then(() => {
+                alert("コードを生成し、クリップボードにコピーしました！\nそのままdata.jsに貼り付けられます。");
+            });
         }
     </script>
 </body>
