@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モニターPro - 02 三送会</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="monitor-body">
+
+    <a href="index.html" id="back-to-menu">← メニューに戻る</a>
+
+    <div id="start-overlay" onclick="startPerformance()">
+        <div id="start-btn">練習を開始する</div>
+    </div>
+
+    <div id="tap-left" class="quick-tap" onclick="skip(-5)">◀◀ 5s</div>
+    <div id="tap-right" class="quick-tap" onclick="skip(5)">5s ▶▶</div>
+
+    <div id="monitor-container">
+        <div id="lyrics-guide"></div>
+        <span id="action-label">READY</span>
+        <span id="name-label">...</span>
+    </div>
+
+    <div id="controls">
+        <input type="range" id="seek-bar" value="0" step="0.1">
+        <div class="btn-row">
+            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
+            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">PAUSE</button>
+            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
+        </div>
+    </div>
+
+    <button id="fs-btn" onclick="toggleFullScreen()">[ ] 全画面</button>
+    
+    <video id="video-player" style="display:none;">
+        <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
+    </video>
+
+    <script src="02data.js"></script>
+
+    <script>
+        const video = document.getElementById('video-player');
+        const lyricsEl = document.getElementById('lyrics-guide');
+        const actionEl = document.getElementById('action-label');
+        const nameEl = document.getElementById('name-label');
+        const seekBar = document.getElementById('seek-bar');
+        const container = document.getElementById('monitor-container');
+        const playBtn = document.getElementById('play-pause-btn');
+
+        // ビデオの準備ができたらシークバーの最大値を設定
+        video.onloadedmetadata = () => {
+            seekBar.max = video.duration;
+        };
+
+        function startPerformance() {
+            document.getElementById('start-overlay').style.display = 'none';
+            // 画面端のタップを有効化
+            document.querySelectorAll('.quick-tap').forEach(el => el.style.pointerEvents = 'auto');
+            video.play();
+            setInterval(updateMonitor, 200);
+        }
+
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+                playBtn.innerText = "PAUSE";
+            } else {
+                video.pause();
+                playBtn.innerText = "PLAY";
+            }
+        }
+
+        function skip(sec) {
+            video.currentTime += sec;
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // シークバー操作
+        seekBar.addEventListener('input', () => {
+            video.currentTime = seekBar.value;
+        });
+
+        function updateMonitor() {
+            const currentTime = video.currentTime;
+            seekBar.value = currentTime;
+            
+            let lastMemoIndex = -1;
+            let currentLyrics = "";
+            
+            // data.js の myData を解析
+            const dataSec = myData.map(d => ({s: toSeconds(d[0]), l: d[1], m: d[2]}));
+            
+            for (let i = 0; i < dataSec.length; i++) {
+                if (currentTime >= dataSec[i].s) {
+                    currentLyrics = dataSec[i].l;
+                    if (dataSec[i].m && dataSec[i].m.trim() !== "") lastMemoIndex = i;
+                } else break;
+            }
+
+            lyricsEl.innerText = currentLyrics || "";
+
+            if (lastMemoIndex !== -1) {
+                let memo = dataSec[lastMemoIndex].m;
+                let parts = memo.split(/[、]/);
+                let action = parts[0] || "";
+                let names = (parts[1] || "").replace(/・/g, '\n');
+                let isPrep = action.includes("準備");
+
+                actionEl.innerText = action;
+                nameEl.innerText = names;
+
+                if (isPrep) container.classList.add('is-prep');
+                else container.classList.remove('is-prep');
+
+                // 色判定（01と同じルール）
+                let base = "purple";
+                if (memo.includes("書く") || memo.includes("はがす")) base = "red";
+                else if (memo.includes("入場") || memo.includes("退場")) base = "blue";
+                else if (memo.includes("絵") || memo.includes("板")) base = "green";
+                else if (memo.includes("色塗り")) base = "orange";
+                
+                document.body.className = "monitor-body bg-" + base + (isPrep ? "-prep" : "");
+            }
+        }
+
+        function toSeconds(t) {
+            const p = t.split(':').reverse();
+            return parseInt(p[0]) + (parseInt(p[1] || 0) * 60);
+        }
+    </script>
+</body>
+</html>
