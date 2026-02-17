@@ -3,90 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モニターPro - 現場用修正版</title>
+    <title>モニターPro - 全画面対応版</title>
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* HTMLファイルに残すのは「配置」の微調整だけ */
-        
-        /* メインコンテンツ（残りのスペースを全て埋める） */
+        /* レイアウト微調整 */
         #monitor-container {
-            flex: 1; /* 余ったスペースを全て使う設定 */
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             width: 100%;
-            /* padding-bottom を削除してスクロールを回避 */
-            overflow: hidden; /* はみ出た部分は隠す */
+            overflow: hidden;
         }
-
-        /* 歌詞ガイド */
         #lyrics-guide { 
-            font-size: 2.5vw; /* 少し小さくして調整 */
+            font-size: 2.5vw; 
             color: rgba(255,255,255,0.8) !important;
             margin-bottom: 3vh;
             min-height: 1.2em;
             font-weight: bold; 
         }
-
-        /* アクション指示（READYなど） */
         #action-label { 
-            font-size: 6vw; 
-            font-weight: bold; 
-            margin-bottom: 1vh; 
+            font-size: 6vw; font-weight: bold; margin-bottom: 1vh; 
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-
-        /* 名前表示 */
         #name-label { 
-            font-size: 16vw; 
-            font-weight: 900; 
-            line-height: 1.1; 
-            white-space: pre-wrap; 
-            text-shadow: 4px 4px 10px rgba(0,0,0,0.6);
+            font-size: 16vw; font-weight: 900; line-height: 1.1; 
+            white-space: pre-wrap; text-shadow: 4px 4px 10px rgba(0,0,0,0.6);
         }
-
-        /* 下部のコントロールバー（高さを固定） */
         #controls { 
-            height: 15vh; /* 画面高さの15%に固定 */
-            min-height: 100px; /* 最低でも100pxは確保 */
-            width: 100%; 
+            height: 15vh; min-height: 100px; width: 100%; 
             background: rgba(0,0,0,0.6); 
             border-top: 1px solid rgba(255,255,255,0.2); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1500; 
-            /* paddingを追加して操作しやすく */
-            padding: 10px 0;
-            box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 1500; padding: 10px 0; box-sizing: border-box;
         }
         #seek-bar { width: 90%; cursor: pointer; height: 30px; margin-bottom: 10px;}
         .btn-row { display: flex; gap: 30px; width: 90%; justify-content: center; }
         .ctrl-btn { 
-            flex: 1; /* ボタンを均等な幅にする */
-            max-width: 150px;
-            background: rgba(255,255,255,0.15); 
-            border: 1px solid rgba(255,255,255,0.5); 
-            color: #fff; 
-            padding: 12px 0; /* タップしやすいように縦幅を増やす */
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 18px; 
-            font-weight: bold;
+            flex: 1; max-width: 150px;
+            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.5); 
+            color: #fff; padding: 12px 0; border-radius: 8px; cursor: pointer; 
+            font-size: 18px; font-weight: bold;
         }
-        .ctrl-btn:active { background: rgba(255,255,255,0.4); }
-
-        /* プレーヤー非表示 */
         #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
     </style>
 </head>
 <body class="monitor-body bg-black">
 
     <a href="index.html" id="back-to-index-btn">← TOPへ</a>
+
+    <button id="fullscreen-btn" onclick="toggleFullScreen()">全画面</button>
 
     <div id="start-overlay" onclick="startPerformance()">
         <div class="big-start-btn">
@@ -116,7 +85,6 @@
     <script src="data01.js"></script>
 
     <script>
-        // === JavaScriptは変更なし ===
         let player;
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
@@ -127,6 +95,29 @@
         const dataSec = performanceData.map(d => ({
             s: parseTime(d[0]), l: d[1], m: d[2]
         }));
+
+        // --- 全画面切り替えロジック ---
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                // 全画面に入る
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                    document.documentElement.msRequestFullscreen();
+                }
+            } else {
+                // 全画面を出る
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+            }
+        }
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
@@ -143,8 +134,11 @@
         }
 
         function startPerformance() {
-            // 開始時にオーバーレイを非表示にする
             document.getElementById('start-overlay').style.display = 'none';
+            
+            // 開始時に全画面化を試みる（ブラウザによってはユーザー操作直後のみ許可される）
+            toggleFullScreen();
+            
             player.playVideo();
         }
 
