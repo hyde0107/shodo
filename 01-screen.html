@@ -8,7 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body.monitor-body {
-            background-color: #111;
+            background-color: #333;
             color: #fff;
             font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             min-height: 100vh;
@@ -22,24 +22,22 @@
         }
 
         /* --- 背景色 --- */
-        .bg-black { background: radial-gradient(circle at center, #333 0%, #000 100%); }
+        .bg-black { background: radial-gradient(circle at center, #666 0%, #333 100%); }
         .bg-red   { background: linear-gradient(135deg, #8a0000 0%, #3d0000 100%); }
         .bg-blue  { background: linear-gradient(135deg, #003399 0%, #001133 100%); }
         .bg-green { background: linear-gradient(135deg, #004d40 0%, #00251f 100%); }
         .bg-orange{ background: linear-gradient(135deg, #cc4400 0%, #662200 100%); }
         .bg-purple{ background: linear-gradient(135deg, #5500aa 0%, #220044 100%); }
 
-        /* --- 【修正】準備モード（画面全体が点滅） --- */
+        /* --- 準備モード（色はそのままで点滅） --- */
         @keyframes prep-blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; } /* 暗くなる */
-            100% { opacity: 1; }
+            0% { opacity: 1; filter: brightness(100%); }
+            50% { opacity: 0.6; filter: brightness(120%); }
+            100% { opacity: 1; filter: brightness(100%); }
         }
-        /* 準備中は背景が黒ベースで点滅する */
         body.monitor-body.is-prep {
-            background: #222; /* ベースの色 */
             animation: prep-blink 1.2s infinite ease-in-out;
-            border: 5px solid #666; /* 控えめな枠線 */
+            /* 枠線などはあえて消してシンプルに */
         }
 
         /* --- メインエリア --- */
@@ -51,29 +49,26 @@
             z-index: 10;
         }
 
-        /* 歌詞 */
         #lyrics-guide { 
             font-family: "Hiragino Mincho ProN", serif;
             font-size: 3.5vmin;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.7);
             margin-bottom: 2vh;
             min-height: 1.5em;
         }
 
-        /* アクション名 */
         #action-label { 
             display: inline-block;
             font-size: 6vmin;
             font-weight: 900; 
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             padding: 0.2em 1em;
             border-radius: 50px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.4);
             margin-bottom: 2vh;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* 名前表示 */
         #name-label { 
             display: block;
             font-size: 14vmin;
@@ -85,6 +80,25 @@
             transition: all 0.3s;
         }
         #name-label.two-lines-mode { font-size: 10vmin !important; line-height: 1.2; }
+
+        /* --- 警告バー (02同様に01にも搭載) --- */
+        #next-alert {
+            margin-top: 5vh;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.9);
+            color: #000;
+            font-weight: bold;
+            font-size: 4vmin;
+            border-radius: 10px;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        body.monitor-body.warning-mode #next-alert {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* --- UI --- */
         #header-controls {
@@ -134,6 +148,8 @@
         <span id="action-label">READY</span>
         <br>
         <span id="name-label">...</span>
+        <br>
+        <div id="next-alert">NEXT: ???</div>
     </div>
 
     <div id="controls">
@@ -155,6 +171,7 @@
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
+        const nextAlertEl = document.getElementById('next-alert');
         const seekBar = document.getElementById('seek-bar');
 
         let dataSec = [];
@@ -173,26 +190,16 @@
             return parseInt(parts[0]) * 60 + parseInt(parts[1]);
         }
 
-        function getMemoInfo(memo) {
-            let bgClass = "bg-black";
-            let isPrep = false;
-            if (!memo) return { bgClass, isPrep };
-            
-            if (memo.includes("大字")) bgClass = "bg-red";
-            else if (memo.includes("絵") || memo.includes("めくる") || memo.includes("青")) bgClass = "bg-blue";
-            else if (memo.includes("板") || memo.includes("緑")) bgClass = "bg-green";
-            // スプレーを追加
-            else if (memo.includes("色") || memo.includes("橙") || memo.includes("スプレー")) bgClass = "bg-orange";
-            else if (memo.includes("退場") || memo.includes("紫")) bgClass = "bg-purple";
-            else if (memo.includes("赤")) bgClass = "bg-red";
-            
-            // 準備判定
-            if (memo.includes("準備")) {
-                isPrep = true;
-                bgClass = "bg-black"; // 準備中は基本黒背景で点滅させる
-            }
-            
-            return { bgClass, isPrep };
+        // キーワードから色名（CSSクラス名）を返す関数
+        function getColorFromText(text) {
+            if (!text) return null;
+            if (text.includes("大字")) return "bg-red";
+            if (text.includes("絵") || text.includes("めくる") || text.includes("青")) return "bg-blue";
+            if (text.includes("板") || text.includes("緑")) return "bg-green";
+            if (text.includes("色") || text.includes("橙") || text.includes("スプレー")) return "bg-orange";
+            if (text.includes("退場") || text.includes("紫")) return "bg-purple";
+            if (text.includes("赤")) return "bg-red";
+            return null;
         }
 
         function onYouTubeIframeAPIReady() {
@@ -234,6 +241,7 @@
             const currentTime = player.getCurrentTime();
             if(document.activeElement !== seekBar) seekBar.value = currentTime;
             
+            // --- 現在の表示処理 ---
             let currentIndex = -1;
             let currentLyrics = "";
             for (let i = 0; i < dataSec.length; i++) {
@@ -244,15 +252,36 @@
             }
 
             lyricsEl.innerText = currentLyrics || "";
-            let bgClass = "bg-black";
+            
+            let bgClass = "bg-black"; // デフォルト（グレー）
             let isPrep = false;
 
             if (currentIndex !== -1) {
                 let memo = dataSec[currentIndex].m;
-                const info = getMemoInfo(memo);
-                bgClass = info.bgClass;
-                isPrep = info.isPrep;
+                
+                // 1. 今の指示から色を探す
+                let color = getColorFromText(memo);
+                
+                // 2. 準備判定
+                if (memo.includes("準備")) {
+                    isPrep = true;
+                    // もし今の指示に色がなければ、未来を先読みして色を決める
+                    if (!color) {
+                        for (let j = currentIndex + 1; j < dataSec.length; j++) {
+                            if (dataSec[j].m && dataSec[j].m.trim() !== "") {
+                                let nextColor = getColorFromText(dataSec[j].m);
+                                if (nextColor) {
+                                    color = nextColor; // 未来の色を採用
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (color) bgClass = color;
 
+                // テキスト表示処理
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
                 let nameStr = (parts[1] || "").trim();
@@ -273,8 +302,31 @@
                 nameEl.innerText = names;
             }
 
-            // クラス適用（点滅or色背景）
-            document.body.className = `monitor-body ${bgClass} ${isPrep ? 'is-prep' : ''}`;
+            // --- 次アクション予告 (警告バー) ---
+            let nextIndex = -1;
+            for (let i = 0; i < dataSec.length; i++) {
+                if (dataSec[i].s > currentTime && dataSec[i].m && dataSec[i].m.trim() !== "") {
+                    nextIndex = i;
+                    break;
+                }
+            }
+            let isWarning = false;
+            if (nextIndex !== -1) {
+                const nextItem = dataSec[nextIndex];
+                const timeLeft = nextItem.s - currentTime;
+                // 8秒前から表示
+                if (timeLeft <= 8 && timeLeft > 0) {
+                    isWarning = true;
+                    let nextParts = nextItem.m.split(/[、]/);
+                    nextAlertEl.innerText = `NEXT: ${nextParts[0]} (${timeLeft.toFixed(1)})`;
+                }
+            }
+
+            if (isWarning) document.body.classList.add('warning-mode');
+            else document.body.classList.remove('warning-mode');
+
+            // クラス適用
+            document.body.className = `monitor-body ${bgClass} ${isPrep ? 'is-prep' : ''} ${isWarning ? 'warning-mode' : ''}`;
         }
     </script>
 </body>
