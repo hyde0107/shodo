@@ -38,28 +38,36 @@
         <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
     </video>
 
-    <script src="02data.js"></script>
+    <script src="02date.js"></script>
+    <script src="script.js"></script>
 
     <script>
         const video = document.getElementById('video-player');
-        const lyricsEl = document.getElementById('lyrics-guide');
-        const actionEl = document.getElementById('action-label');
-        const nameEl = document.getElementById('name-label');
         const seekBar = document.getElementById('seek-bar');
-        const container = document.getElementById('monitor-container');
         const playBtn = document.getElementById('play-pause-btn');
 
-        // ビデオの準備ができたらシークバーの最大値を設定
+        // script.jsの更新関数に渡す要素セット
+        const elements = {
+            lyricsEl: document.getElementById('lyrics-guide'),
+            actionEl: document.getElementById('action-label'),
+            nameEl: document.getElementById('name-label'),
+            container: document.getElementById('monitor-container')
+        };
+
         video.onloadedmetadata = () => {
             seekBar.max = video.duration;
         };
 
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
-            // 画面端のタップを有効化
             document.querySelectorAll('.quick-tap').forEach(el => el.style.pointerEvents = 'auto');
             video.play();
-            setInterval(updateMonitor, 200);
+            
+            // script.jsの共通UI更新関数を呼び出す
+            setInterval(() => {
+                seekBar.value = video.currentTime;
+                updateMonitorUI(video.currentTime, myData, elements);
+            }, 200);
         }
 
         function togglePlay() {
@@ -72,70 +80,16 @@
             }
         }
 
-        function skip(sec) {
-            video.currentTime += sec;
-        }
+        function skip(sec) { video.currentTime += sec; }
 
         function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
         }
 
-        // シークバー操作
         seekBar.addEventListener('input', () => {
             video.currentTime = seekBar.value;
         });
-
-        function updateMonitor() {
-            const currentTime = video.currentTime;
-            seekBar.value = currentTime;
-            
-            let lastMemoIndex = -1;
-            let currentLyrics = "";
-            
-            // data.js の myData を解析
-            const dataSec = myData.map(d => ({s: toSeconds(d[0]), l: d[1], m: d[2]}));
-            
-            for (let i = 0; i < dataSec.length; i++) {
-                if (currentTime >= dataSec[i].s) {
-                    currentLyrics = dataSec[i].l;
-                    if (dataSec[i].m && dataSec[i].m.trim() !== "") lastMemoIndex = i;
-                } else break;
-            }
-
-            lyricsEl.innerText = currentLyrics || "";
-
-            if (lastMemoIndex !== -1) {
-                let memo = dataSec[lastMemoIndex].m;
-                let parts = memo.split(/[、]/);
-                let action = parts[0] || "";
-                let names = (parts[1] || "").replace(/・/g, '\n');
-                let isPrep = action.includes("準備");
-
-                actionEl.innerText = action;
-                nameEl.innerText = names;
-
-                if (isPrep) container.classList.add('is-prep');
-                else container.classList.remove('is-prep');
-
-                // 色判定（01と同じルール）
-                let base = "purple";
-                if (memo.includes("書く") || memo.includes("はがす")) base = "red";
-                else if (memo.includes("入場") || memo.includes("退場")) base = "blue";
-                else if (memo.includes("絵") || memo.includes("板")) base = "green";
-                else if (memo.includes("色塗り")) base = "orange";
-                
-                document.body.className = "monitor-body bg-" + base + (isPrep ? "-prep" : "");
-            }
-        }
-
-        function toSeconds(t) {
-            const p = t.split(':').reverse();
-            return parseInt(p[0]) + (parseInt(p[1] || 0) * 60);
-        }
     </script>
 </body>
 </html>
