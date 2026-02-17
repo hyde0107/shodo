@@ -5,11 +5,11 @@
    (index.html, 01.htmlなどで使用)
    ========================================= */
 
-/* --- 基本設定 --- */
+/* --- 基本設定（和風・シンプル） --- */
 body {
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-    background: #e8e4df;
-    color: #000;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+    background: #e8e4df; /* 和紙っぽいベージュ */
+    color: #111;
     margin: 0;
     padding: 20px;
     display: flex;
@@ -28,29 +28,33 @@ body {
 
 h1 {
     font-size: 2.2em;
-    border-bottom: 3px solid #000;
+    font-weight: normal; /* 明朝体なので細めが綺麗 */
+    border-bottom: 2px solid #111;
     display: inline-block;
     margin-bottom: 40px;
     padding: 0 20px 10px;
     text-align: center;
+    letter-spacing: 0.1em;
 }
 
-/* --- ボタン共通 --- */
+/* --- ボタン共通デザイン --- */
 .btn {
     display: inline-block;
     text-decoration: none;
-    color: #000;
-    border: 1px solid #000;
-    padding: 8px 20px;
+    color: #111;
+    border: 1px solid #111;
+    padding: 10px 25px;
     background: #fff;
     cursor: pointer;
-    transition: 0.3s;
-    font-size: 0.9em;
+    transition: all 0.2s ease;
+    font-size: 0.95em;
     text-align: center;
-    border-radius: 4px;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; /* ボタンも明朝体 */
+    border-radius: 2px; /* 角を少しだけ丸くする程度 */
 }
 .btn:hover {
-    background: #f0f0f0;
+    background: #111;
+    color: #fff;
 }
 
 /* --- リスト表示エリア --- */
@@ -62,235 +66,200 @@ h1 {
     justify-content: center;
 }
 
-.player-section {
-    flex: 1;
-    min-width: 300px;
-}
-
+.player-section { flex: 1; min-width: 300px; }
 .list-section {
-    flex: 1;
-    min-width: 300px;
+    flex: 1; min-width: 300px;
     background: #fff;
     padding: 20px;
-    border: 1px solid #000;
+    border: 1px solid #111;
     max-height: 60vh;
     overflow-y: auto;
 }
 
-/* --- タイムスタンプリストのアイテム --- */
+/* タイムスタンプリスト */
 .timestamp-item {
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
     cursor: pointer;
     transition: background 0.2s;
 }
-.timestamp-item:hover {
-    background: #f9f9f9;
-}
-/* 再生中のハイライト */
+.timestamp-item:hover { background: #f9f9f9; }
 .timestamp-item.playing {
-    background: #e6f7ff;
-    border-left: 5px solid #007bff;
+    background: #e8e4df; /* テーマカラーでハイライト */
+    border-left: 4px solid #111;
 }
 
-.item-main {
-    display: flex;
-    align-items: baseline;
-}
+.item-main { display: flex; align-items: baseline; }
 .time-badge {
+    font-family: "Courier New", monospace; /* 時間は等幅フォント */
     font-weight: bold;
-    margin-right: 10px;
-    font-family: monospace;
+    margin-right: 15px;
+    font-size: 0.9em;
 }
+.text-content { font-size: 1.05em; }
 
-/* --- メモの色分け設定 --- */
+/* メモの色分け */
 .memo-content {
-    margin-top: 5px;
-    margin-left: 55px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #666; /* デフォルト */
+    margin-top: 5px; margin-left: 60px;
+    font-size: 0.85rem; font-family: sans-serif; /* メモは見やすさ重視 */
+    color: #666;
 }
 .memo-content:empty { display: none; }
+.memo-color-1 { color: #d9534f !important; }
+.memo-color-2 { color: #007bff !important; }
+.memo-color-3 { color: #28a745 !important; }
+.memo-color-4 { color: #fd7e14 !important; }
+.memo-color-5 { color: #6f42c1 !important; }
 
-/* JSから付与される色クラス */
-.memo-color-1 { color: #d9534f !important; } /* 赤：大字 */
-.memo-color-2 { color: #007bff !important; } /* 青：色 */
-.memo-color-3 { color: #28a745 !important; } /* 緑：文字 */
-.memo-color-4 { color: #fd7e14 !important; } /* 橙：スプレー */
-.memo-color-5 { color: #6f42c1 !important; } /* 紫：その他 */
-
-/* --- 管理者用ツール共通 --- */
-.admin-box {
-    background: #fff;
-    border: 1px solid #000;
-    padding: 25px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 20px;
-}
-.admin-box textarea {
-    width: 100%;
-    height: 150px;
-    margin: 10px 0;
-    padding: 10px;
-    box-sizing: border-box;
-}
+/* 管理者用 */
+.admin-box { background: #fff; border: 1px solid #111; padding: 25px; width: 100%; box-sizing: border-box; }
+.admin-box textarea { width: 100%; height: 150px; margin: 10px 0; padding: 10px; border: 1px solid #ccc; font-family: monospace; }
 
 
 /* =========================================
    2. モニター画面（01-screen.html）専用スタイル
    ========================================= */
+/*
+   コンセプト: 黒背景（機能性）× 明朝体UI（統一感）
+*/
 
-/* 全要素に「サイズ計算に枠線を含める」設定 */
-*, *::before, *::after {
-    box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
-/* モニター画面の基本設定：スクロールを物理的に封じる */
 body.monitor-body {
-    color: #ffffff !important;
     background-color: #000000;
-    font-family: "Hiragino Sans", "Meiryo", sans-serif; /* モニターは見やすいゴシック体推奨 */
+    color: #ffffff !important;
     
-    /* 画面位置を強制固定 */
-    position: fixed; 
-    top: 0;
-    left: 0;
+    /* UIパーツは明朝体で統一感を出す */
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     
-    /* 幅と高さの指定 */
-    width: 100%;
-    height: 100%;       
-    height: 100dvh;     /* スマホ・タブレットのアドレスバーを除いた実質の高さ */
-    
-    /* はみ出し防止 */
-    overflow: hidden; 
-    margin: 0 !important;
-    padding: 0 !important;
-    
-    display: flex;
-    flex-direction: column;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; height: 100dvh;
+    overflow: hidden;
+    margin: 0 !important; padding: 0 !important;
+    display: flex; flex-direction: column;
 }
 
-/* コンテンツエリア：余白を最小限に */
+/* メイン表示エリア */
 #monitor-container {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* 垂直方向中央 */
-    align-items: center;     /* 水平方向中央 */
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
     text-align: center;
+    width: 100%; min-height: 0; overflow: hidden; padding: 10px;
     
-    width: 100%;
-    min-height: 0; /* 縮小を許可 */
-    overflow: hidden;
-    padding: 5px; /* 画面端との余白 */
+    /* 背景色が変わる際のトランジション */
+    transition: background-color 0.3s ease;
 }
 
-/* コントロールバー：高さを90pxまで圧縮 */
+/* コントロールバー：シンプルでフラットなデザインに */
 #controls {
     height: 90px;
-    flex-shrink: 0; /* 絶対に縮めさせない */
-    
+    flex-shrink: 0;
     width: 100%;
-    background: rgba(0,0,0,0.8);
-    border-top: 1px solid rgba(255,255,255,0.3);
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    /* 完全な黒ではなく、ごくわずかにグレーを入れて境界を意識 */
+    background: #111; 
+    border-top: 1px solid #333;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     z-index: 1500;
-    
-    /* 余白調整 */
-    padding-bottom: 10px; 
-    padding-top: 5px;
+    padding-bottom: 15px; padding-top: 10px;
 }
 
-/* スタートボタン */
+/* --- モニター画面専用ボタン --- */
+/* メイン画面の.btnを反転させたデザイン */
+.ctrl-btn {
+    flex: 1; max-width: 120px;
+    background: transparent;
+    border: 1px solid #fff; /* 白枠 */
+    color: #fff;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; /* 明朝体 */
+    border-radius: 2px; /* 角ばらせる */
+    transition: all 0.2s;
+}
+
+/* 押したとき・ホバーしたとき */
+.ctrl-btn:active, .ctrl-btn:hover {
+    background: #e8e4df; /* ここでメイン画面のベージュを使う！ */
+    color: #000;         /* 文字は黒に */
+    border-color: #e8e4df;
+}
+
+/* 開始ボタン */
 .big-start-btn {
-    font-size: 3rem; 
-    font-weight: bold; 
-    color: #000; 
-    background-color: #fff;
-    padding: 3rem 5rem; 
-    border-radius: 100px; 
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    font-size: 2.5rem;
+    color: #000;
+    background-color: #e8e4df; /* ベージュ背景 */
+    padding: 2rem 4rem;
+    border: 1px solid #fff; /* 二重線っぽく見せる演出 */
+    outline: 5px double #e8e4df;
     cursor: pointer;
-    box-shadow: 0 0 30px rgba(255,255,255,0.8); 
-    text-align: center; 
+    text-align: center;
     margin-bottom: 10vh;
-}
-.big-start-btn:active {
-    transform: scale(0.95);
+    letter-spacing: 0.1em;
 }
 
-/* 全画面オーバーレイ */
 #start-overlay {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    background-color: #000000; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 9999;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #000;
+    display: flex; justify-content: center; align-items: center; z-index: 9999;
 }
 
-/* 戻るボタン（白背景・黒文字・枠線あり） */
-#back-to-index-btn {
-    position: fixed; 
-    top: 15px; 
-    left: 15px; 
+/* 戻るボタン・全画面ボタンの配置 */
+#header-controls {
+    position: fixed; top: 15px; left: 15px; right: 15px;
+    display: flex; justify-content: space-between;
     z-index: 2000;
-    
-    /* 共通デザイン(.btn)を強制適用しつつカスタマイズ */
-    background-color: #ffffff !important; 
-    color: #000000 !important; 
-    border: 1px solid #000000 !important;
-    padding: 5px 15px; 
-    text-decoration: none; 
-    font-size: 0.8em; 
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
+    pointer-events: none; /* エリア自体はクリック透過 */
+}
+#header-controls > * { pointer-events: auto; } /* 中身はクリック可能 */
+
+#back-to-index-btn, #fullscreen-btn {
+    background-color: transparent !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    padding: 6px 15px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: 0.2s;
+}
+#back-to-index-btn:hover, #fullscreen-btn:hover {
+    background-color: #fff !important;
+    color: #000 !important;
 }
 
-/* 全画面ボタン */
-#fullscreen-btn {
-    position: fixed; 
-    top: 15px; 
-    right: 15px; 
-    z-index: 2000;
-    color: rgba(255,255,255,0.6); 
-    background: rgba(0,0,0,0.4); 
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 5px 15px; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    font-size: 1rem;
+/* シークバー（シンプル化） */
+input[type=range] {
+    -webkit-appearance: none; width: 90%; background: transparent; margin-bottom: 10px;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+    background: #e8e4df; /* ベージュ */
+    cursor: pointer; margin-top: -6px;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 4px; background: #555; border-radius: 2px;
 }
 
-/* --- 背景色設定（文字色白） --- */
+/* 背景色ユーティリティ */
 .bg-black { background-color: #000000 !important; }
-.bg-red    { background-color: #cc0000 !important; }
-.bg-blue   { background-color: #0044cc !important; }
-.bg-green  { background-color: #008800 !important; }
-.bg-orange { background-color: #dd6600 !important; }
-.bg-purple { background-color: #6600cc !important; }
+/* 色付き背景は少し彩度を落として「和」っぽく馴染ませる */
+.bg-red    { background-color: #8a1c1c !important; }
+.bg-blue   { background-color: #1c3d8a !important; }
+.bg-green  { background-color: #1c6b1c !important; }
+.bg-orange { background-color: #bd5900 !important; }
+.bg-purple { background-color: #5d1c8a !important; }
 
-/* 準備中の点滅背景 */
-.bg-red-prep    { background-color: #660000 !important; }
-.bg-blue-prep   { background-color: #002244 !important; }
-.bg-green-prep  { background-color: #003300 !important; }
-.bg-orange-prep { background-color: #663300 !important; }
-.bg-purple-prep { background-color: #2d1a4d !important; }
-
-@keyframes flash-prep { 
-    0%, 100% { opacity: 1; } 
-    50% { opacity: 0.6; } 
-}
-.is-prep { 
-    animation: flash-prep 1.5s infinite; 
-}
+/* 準備中の点滅 */
+.bg-red-prep    { background-color: #4d0000 !important; }
+.bg-blue-prep   { background-color: #001133 !important; }
+.bg-green-prep  { background-color: #002200 !important; }
+.bg-orange-prep { background-color: #4d2200 !important; }
+.bg-purple-prep { background-color: #220033 !important; }
+@keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.is-prep { animation: flash-prep 1.5s infinite; }
