@@ -10,7 +10,6 @@ body {
     align-items: center;
 }
 
-/* ページ全体の幅制限 */
 .page-wrapper {
     width: 100%;
     max-width: 1000px;
@@ -28,7 +27,122 @@ h1 {
     text-align: center;
 }
 
-/* --- コンポーネント：ボタン系 --- */
+/* --- トップページ専用：カードレイアウト --- */
+.container { 
+    display: flex; 
+    justify-content: center; 
+    gap: 20px; 
+    flex-wrap: wrap; 
+    width: 100%;
+}
+
+.card {
+    background: #fff; 
+    border: 1px solid #000; 
+    width: 280px; 
+    padding: 30px;
+    text-decoration: none; 
+    color: #000; 
+    transition: 0.3s; 
+    position: relative;
+    box-sizing: border-box; /* サイズ崩れ防止 */
+}
+
+.card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 10px 10px 0 #000; 
+}
+
+.card h2 { 
+    font-size: 1.4em; 
+    margin: 0 0 15px; 
+    border-left: 5px solid #000; 
+    padding-left: 10px; 
+}
+
+.hanko {
+    border: 2px solid #a40000; 
+    color: #a40000; 
+    width: 50px; 
+    height: 50px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: bold; 
+    font-size: 0.8em; 
+    margin-left: auto; 
+    transform: rotate(-10deg);
+    border-radius: 50%;
+}
+
+/* --- 解析ページ専用：プレイヤー＆リスト --- */
+.app-container { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 20px; 
+    width: 100%; 
+}
+
+.player-section { flex: 1.2; min-width: 320px; }
+.video-container { 
+    width: 100%; 
+    aspect-ratio: 16 / 9; 
+    background: #000; 
+    border: 1px solid #000; 
+}
+
+.list-section { 
+    flex: 0.8; 
+    min-width: 320px; 
+    background: #fff; 
+    border: 1px solid #000; 
+    max-height: 70vh; 
+    overflow-y: auto; 
+}
+
+.timestamp-item { 
+    display: flex; 
+    flex-direction: column; 
+    padding: 12px 10px; 
+    border-bottom: 1px solid #eee; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    border-left: 4px solid transparent;
+}
+
+.timestamp-item.playing { 
+    background: #eef6ff; 
+    border-left: 4px solid #007bff; 
+    font-weight: bold; 
+}
+
+.time-badge { 
+    background: #000; 
+    color: #fff; 
+    padding: 2px 8px; 
+    font-size: 0.8em; 
+    margin-right: 12px; 
+    border-radius: 4px; 
+}
+
+/* --- メモの色分け（解析ページ用） --- */
+.memo-content {
+    margin-top: 5px;
+    margin-left: 55px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #666; /* デフォルト色 */
+}
+
+.memo-content:empty { display: none; }
+
+.memo-color-1 { color: #d9534f !important; } /* 赤：大字 */
+.memo-color-2 { color: #007bff !important; } /* 青：色 */
+.memo-color-3 { color: #28a745 !important; } /* 緑：文字 */
+.memo-color-4 { color: #fd7e14 !important; } /* 橙：スプレー */
+.memo-color-5 { color: #6f42c1 !important; } /* 紫：その他 */
+
+/* --- その他ボタン類 --- */
 .btn {
     display: inline-block;
     text-decoration: none;
@@ -39,58 +153,8 @@ h1 {
     cursor: pointer;
     transition: 0.3s;
     font-size: 0.9em;
-    text-align: center;
 }
 
-.btn:hover {
-    background: #000;
-    color: #fff;
-}
+.btn:hover { background: #000; color: #fff; }
 
-.back-link { margin-top: 30px; }
-
-/* --- 解析ページ：プレイヤー＆リスト --- */
-.app-container { display: flex; flex-wrap: wrap; gap: 20px; width: 100%; }
-.player-section { flex: 1.2; min-width: 320px; }
-.video-container { width: 100%; aspect-ratio: 16 / 9; background: #000; border: 1px solid #000; }
-.list-section { 
-    flex: 0.8; min-width: 320px; background: #fff; border: 1px solid #000; 
-    max-height: 70vh; overflow-y: auto; 
-}
-
-/* リストアイテム */
-.timestamp-item { 
-    display: flex; flex-direction: column; padding: 12px 10px; 
-    border-bottom: 1px solid #eee; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent;
-}
-.timestamp-item:hover { background: #f5f5f5; border-left: 4px solid #000; }
-.timestamp-item.playing { background: #eef6ff; border-left: 4px solid #007bff; font-weight: bold; }
-
-.time-badge { 
-    background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; 
-    margin-right: 12px; border-radius: 4px; display: inline-block;
-}
-
-/* --- メモの色分け設定 --- */
-.memo-content {
-    margin-top: 5px;
-    margin-left: 55px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #000; /* 基本は黒 */
-}
-
-/* メモが空なら非表示 */
-.memo-content:empty { display: none; }
-
-/* JavaScriptから付与される色分けクラス（!importantで強制適用） */
-.memo-color-1 { color: #d9534f !important; } /* 赤：大字 */
-.memo-color-2 { color: #007bff !important; } /* 青：色 */
-.memo-color-3 { color: #28a745 !important; } /* 緑：文字 */
-.memo-color-4 { color: #fd7e14 !important; } /* 橙：スプレー */
-.memo-color-5 { color: #6f42c1 !important; } /* 紫：その他（人名など） */
-
-/* スクロールバーのカスタマイズ（任意） */
-.list-section::-webkit-scrollbar { width: 8px; }
-.list-section::-webkit-scrollbar-track { background: #f1f1f1; }
-.list-section::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+.admin-footer { margin-top: 80px; width: 100%; text-align: center; border-top: 1px solid #ccc; padding-top: 20px; }
