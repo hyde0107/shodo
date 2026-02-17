@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>モニターPro - 全画面対応版</title>
+    <title>モニターPro - コントロール優先版</title>
     <link rel="stylesheet" href="style.css">
     
     <style>
         /* レイアウト微調整 */
+        
+        /* メイン画面：ここが大きくても下にはみ出さないようにする */
         #monitor-container {
             flex: 1;
             display: flex;
@@ -16,50 +18,69 @@
             align-items: center;
             text-align: center;
             width: 100%;
-            overflow: hidden;
+            overflow: hidden; /* はみ出したら隠す */
+            min-height: 0;    /* Flexboxで縮小を許可するために重要 */
         }
+
+        /* 歌詞ガイド */
         #lyrics-guide { 
             font-size: 2.5vw; 
             color: rgba(255,255,255,0.8) !important;
-            margin-bottom: 3vh;
+            margin-bottom: 2vh;
             min-height: 1.2em;
-            font-weight: bold; 
+            font-weight: bold;
+            flex-shrink: 0;
         }
+
+        /* アクション指示（READYなど） */
         #action-label { 
-            font-size: 6vw; font-weight: bold; margin-bottom: 1vh; 
+            font-size: 6vw; 
+            font-weight: bold; 
+            margin-bottom: 1vh; 
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
+
+        /* 名前表示 - これが大きすぎたら文字を小さくして収める */
         #name-label { 
-            font-size: 16vw; font-weight: 900; line-height: 1.1; 
-            white-space: pre-wrap; text-shadow: 4px 4px 10px rgba(0,0,0,0.6);
+            font-size: 14vw; /* 少し小さく調整 */
+            font-weight: 900; 
+            line-height: 1.1; 
+            white-space: pre-wrap; 
+            text-shadow: 4px 4px 10px rgba(0,0,0,0.6);
+            /* 画面からはみ出しそうな場合の安全策 */
+            max-height: 50vh; 
+            overflow: hidden;
         }
-        #controls { 
-            height: 15vh; min-height: 100px; width: 100%; 
-            background: rgba(0,0,0,0.6); 
-            border-top: 1px solid rgba(255,255,255,0.2); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 1500; padding: 10px 0; box-sizing: border-box;
-        }
-        #seek-bar { width: 90%; cursor: pointer; height: 30px; margin-bottom: 10px;}
-        .btn-row { display: flex; gap: 30px; width: 90%; justify-content: center; }
+
+        /* コントロールバーのスタイルはstyle.css側で強制指定済み */
+        #seek-bar { width: 90%; cursor: pointer; height: 30px; margin-bottom: 15px;}
+        .btn-row { display: flex; gap: 20px; width: 95%; justify-content: center; }
         .ctrl-btn { 
-            flex: 1; max-width: 150px;
-            background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.5); 
-            color: #fff; padding: 12px 0; border-radius: 8px; cursor: pointer; 
-            font-size: 18px; font-weight: bold;
+            flex: 1; max-width: 120px;
+            background: rgba(255,255,255,0.15); 
+            border: 1px solid rgba(255,255,255,0.5); 
+            color: #fff; 
+            padding: 15px 0; /* タップ範囲を広く */
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
         }
+        .ctrl-btn:active { background: rgba(255,255,255,0.4); }
+
         #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
     </style>
 </head>
 <body class="monitor-body bg-black">
 
-    <a href="index.html" id="back-to-index-btn">← TOPへ</a>
-
+    <a href="index.html" id="back-to-index-btn" class="btn">← 戻る</a>
     <button id="fullscreen-btn" onclick="toggleFullScreen()">全画面</button>
 
     <div id="start-overlay" onclick="startPerformance()">
         <div class="big-start-btn">
-            練習を開始する
+            練習開始<br>
+            <span style="font-size:1.5rem; font-weight:normal;">(Tap to Start)</span>
         </div>
     </div>
 
@@ -96,25 +117,18 @@
             s: parseTime(d[0]), l: d[1], m: d[2]
         }));
 
-        // --- 全画面切り替えロジック ---
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                // 全画面に入る
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                } else if (document.documentElement.webkitRequestFullscreen) {
                     document.documentElement.webkitRequestFullscreen();
-                } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
-                    document.documentElement.msRequestFullscreen();
                 }
             } else {
-                // 全画面を出る
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari */
+                } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { /* IE11 */
-                    document.msExitFullscreen();
                 }
             }
         }
@@ -135,10 +149,7 @@
 
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
-            
-            // 開始時に全画面化を試みる（ブラウザによってはユーザー操作直後のみ許可される）
-            toggleFullScreen();
-            
+            // 自動全画面化コードを削除しました
             player.playVideo();
         }
 
