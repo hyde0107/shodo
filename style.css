@@ -72,22 +72,23 @@ h1 {
 }
 
 /* --- メモの色分け設定 --- */
-.memo-content { 
-    margin-top: 5px; 
-    margin-left: 55px; 
-    font-size: 0.85rem; 
-    font-weight: bold; 
+.memo-content {
+    margin-top: 5px;
+    margin-left: 55px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #000; /* 基本は黒 */
 }
 
 /* メモが空なら非表示 */
 .memo-content:empty { display: none; }
 
-/* JavaScriptから付与される色分けクラス */
-.memo-color-1 { color: #d9534f !important; } /* 赤系：決め */
-.memo-color-2 { color: #007bff !important; } /* 青系：サビ */
-.memo-color-3 { color: #28a745 !important; } /* 緑系：間奏 */
-.memo-color-4 { color: #fd7e14 !important; } /* 橙系：期待 */
-.memo-color-5 { color: #6f42c1 !important; } /* 紫系：その他 */
+/* JavaScriptから付与される色分けクラス（!importantで強制適用） */
+.memo-color-1 { color: #d9534f !important; } /* 赤：大字 */
+.memo-color-2 { color: #007bff !important; } /* 青：色 */
+.memo-color-3 { color: #28a745 !important; } /* 緑：文字 */
+.memo-color-4 { color: #fd7e14 !important; } /* 橙：スプレー */
+.memo-color-5 { color: #6f42c1 !important; } /* 紫：その他（人名など） */
 
 /* スクロールバーのカスタマイズ（任意） */
 .list-section::-webkit-scrollbar { width: 8px; }
