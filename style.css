@@ -118,3 +118,48 @@ pre#result, #output {
 /* 管理者用フッター */ 
 .admin-footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid #ccc; width: 100%; text-align: center; } 
 .admin-footer p { font-size: 0.9em; color: #666; }
+
+/* =========================================
+   モニター画面（01-screen.html）専用スタイル
+   ========================================= */
+
+/* モニター画面での基本テキスト色は白にする（bodyの黒設定を上書き） */
+.bg-black, .bg-red, .bg-blue, .bg-green, .bg-orange, .bg-purple,
+.bg-red-prep, .bg-blue-prep, .bg-green-prep, .bg-orange-prep, .bg-purple-prep {
+    color: #fff;
+}
+
+/* --- 背景色定義 --- */
+.bg-black { background-color: #000; }
+
+.bg-red    { background-color: #cc0000; }
+.bg-blue   { background-color: #0044cc; }
+.bg-green  { background-color: #008800; }
+.bg-orange { background-color: #dd6600; }
+.bg-purple { background-color: #6600cc; }
+
+/* --- 準備中（暗めの色） --- */
+.bg-red-prep    { background-color: #660000; }
+.bg-blue-prep   { background-color: #002244; }
+.bg-green-prep  { background-color: #003300; }
+.bg-orange-prep { background-color: #663300; }
+.bg-purple-prep { background-color: #2d1a4d; }
+
+/* --- アニメーション（準備中の点滅） --- */
+@keyframes flash-prep { 
+    0%, 100% { opacity: 1; } 
+    50% { opacity: 0.4; } 
+}
+.is-prep { 
+    animation: flash-prep 1.5s infinite; 
+}
+
+/* --- レイアウト調整 --- */
+/* モニター画面のbody用 */
+body.monitor-body {
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
