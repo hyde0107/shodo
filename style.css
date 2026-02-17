@@ -47,23 +47,7 @@ h1 {
     color: #fff;
 }
 
-.btn-admin { background: #a40000; color: #fff; border: none; } /* 強調用 */
-
 .back-link { margin-top: 30px; }
-
-/* --- ホーム画面：カード --- */
-.container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-.card {
-    background: #fff; border: 1px solid #000; width: 280px; padding: 30px;
-    text-decoration: none; color: #000; transition: 0.3s; position: relative;
-}
-.card:hover { transform: translateY(-5px); box-shadow: 10px 10px 0 #000; }
-.card h2 { font-size: 1.4em; margin: 0 0 15px; border-left: 5px solid #000; padding-left: 10px; }
-.hanko {
-    border: 2px solid #a40000; color: #a40000; width: 45px; height: 45px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; font-size: 0.8em; margin-left: auto; transform: rotate(-5deg);
-}
 
 /* --- 解析ページ：プレイヤー＆リスト --- */
 .app-container { display: flex; flex-wrap: wrap; gap: 20px; width: 100%; }
@@ -81,28 +65,31 @@ h1 {
 }
 .timestamp-item:hover { background: #f5f5f5; border-left: 4px solid #000; }
 .timestamp-item.playing { background: #eef6ff; border-left: 4px solid #007bff; font-weight: bold; }
-.time-badge { background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; margin-right: 12px; border-radius: 4px; }
-.memo-content { margin-top: 5px; margin-left: 55px; font-size: 0.85rem; color: #a40000; font-weight: bold; }
 
-/* --- 管理者用ツール共通 --- */
-.admin-box { background: #fff; border: 1px solid #000; padding: 25px; width: 100%; box-sizing: border-box; }
-.admin-box textarea { width: 100%; height: 150px; margin: 10px 0; padding: 10px; box-sizing: border-box; font-family: monospace; }
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
-.admin-table th, .admin-table td { border: 1px solid #ccc; padding: 10px; }
-.admin-table input { width: 100%; border: none; padding: 5px; box-sizing: border-box; background: #f9f9f9; }
-
-pre#result, #output { 
-    background: #333; color: #fff; padding: 20px; white-space: pre-wrap; 
-    display: none; margin-top: 20px; font-size: 0.9em; 
+.time-badge { 
+    background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; 
+    margin-right: 12px; border-radius: 4px; display: inline-block;
 }
 
-/* 管理者用フッター */
-.admin-footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid #ccc; width: 100%; text-align: center; }
-.admin-footer p { font-size: 0.9em; color: #666; }
+/* --- メモの色分け設定 --- */
+.memo-content { 
+    margin-top: 5px; 
+    margin-left: 55px; 
+    font-size: 0.85rem; 
+    font-weight: bold; 
+}
 
-/* メモの内容に応じた色分け */
-.memo-type-1 { color: #d9534f; } /* 赤系：情熱・重要 */
-.memo-type-2 { color: #428bca; } /* 青系：冷静・メロディ */
-.memo-type-3 { color: #5cb85c; } /* 緑系：自然・安らぎ */
-.memo-type-4 { color: #f0ad4e; } /* オレンジ系：光・変化 */
-.memo-type-5 { color: #9966cc; } /* 紫系：神秘・深淵 */
+/* メモが空なら非表示 */
+.memo-content:empty { display: none; }
+
+/* JavaScriptから付与される色分けクラス */
+.memo-color-1 { color: #d9534f !important; } /* 赤系：決め */
+.memo-color-2 { color: #007bff !important; } /* 青系：サビ */
+.memo-color-3 { color: #28a745 !important; } /* 緑系：間奏 */
+.memo-color-4 { color: #fd7e14 !important; } /* 橙系：期待 */
+.memo-color-5 { color: #6f42c1 !important; } /* 紫系：その他 */
+
+/* スクロールバーのカスタマイズ（任意） */
+.list-section::-webkit-scrollbar { width: 8px; }
+.list-section::-webkit-scrollbar-track { background: #f1f1f1; }
+.list-section::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
