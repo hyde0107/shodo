@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>大画面モニター - 修正版</title>
+    <title>モニター - 01 2026公民館</title>
     <style>
         body {
             margin: 0;
@@ -15,77 +15,63 @@
             transition: background-color 0.4s;
             background-color: #000;
             color: #fff;
-            cursor: pointer;
-            /* タップ時の青い枠を消す */
-            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 画面全体をクリック可能にする */
-        #click-overlay {
+        /* --- スタートボタン（反応を確実にするため） --- */
+        #start-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100; /* 一番上に配置 */
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        #start-btn {
+            padding: 20px 40px;
+            font-size: 5vw;
+            background: #fff;
+            color: #000;
+            border-radius: 50px;
+            font-weight: bold;
         }
 
         #monitor-container {
             text-align: center;
             width: 98%;
-            pointer-events: none; /* 下のオーバーレイにクリックを通す */
+            display: none; /* 最初は隠しておく */
         }
 
-        #action-label {
-            font-size: 6vw;
-            margin-bottom: 2vh;
-            display: block;
-            font-weight: bold;
-        }
+        #action-label { font-size: 6vw; margin-bottom: 2vh; display: block; font-weight: bold; }
+        #name-label { font-size: 16vw; font-weight: 900; display: block; line-height: 1.1; white-space: pre-wrap; }
 
-        #name-label {
-            font-size: 16vw;
-            font-weight: 900;
-            display: block;
-            line-height: 1.1;
-            white-space: pre-wrap;
-            text-shadow: 2px 2px 20px rgba(0,0,0,0.4);
-        }
-
-        @keyframes flash-prep {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
+        /* 点滅アニメーション */
+        @keyframes flash-prep { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         .is-prep { animation: flash-prep 1.5s infinite; }
 
-        .bg-red { background-color: #ff0000; }
-        .bg-red-prep { background-color: #660000; }
-        .bg-blue { background-color: #007bff; }
-        .bg-blue-prep { background-color: #002244; }
-        .bg-green { background-color: #28a745; }
-        .bg-green-prep { background-color: #0d3316; }
-        .bg-orange { background-color: #fd7e14; }
-        .bg-orange-prep { background-color: #663300; }
-        .bg-purple { background-color: #6f42c1; }
-        .bg-purple-prep { background-color: #2d1a4d; }
+        /* 背景色設定 */
+        .bg-red { background-color: #ff0000; } .bg-red-prep { background-color: #660000; }
+        .bg-blue { background-color: #007bff; } .bg-blue-prep { background-color: #002244; }
+        .bg-green { background-color: #28a745; } .bg-green-prep { background-color: #0d3316; }
+        .bg-orange { background-color: #fd7e14; } .bg-orange-prep { background-color: #663300; }
+        .bg-purple { background-color: #6f42c1; } .bg-purple-prep { background-color: #2d1a4d; }
         .bg-black { background-color: #000; }
 
-        /* 動画は見えないが、消しはしない設定 */
-        #player-wrapper {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
+        #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
     </style>
 </head>
-<body>
+<body onclick="togglePlay()">
 
-    <div id="click-overlay" onclick="togglePlay()"></div>
+    <div id="start-overlay" onclick="startPerformance(event)">
+        <div style="margin-bottom:20px; color:#aaa;">01 2026公民館</div>
+        <div id="start-btn">TAP TO START</div>
+    </div>
 
     <div id="monitor-container">
-        <span id="action-label">READY</span>
-        <span id="name-label">画面をタップして開始</span>
+        <span id="action-label" id="action-label">READY</span>
+        <span id="name-label" id="name-label">...</span>
     </div>
     
     <div id="player-wrapper"><div id="player"></div></div>
@@ -95,53 +81,41 @@
         const myData = [
             ["00:00", "一番きれいな色ってなんだろう？", "色①、るな・みゆ"],
             ["00:26", "♪ (Instrumental)", "スプレー準備、あん・さき"],
-            ["00:37", "「本当の自分」を...", "スプレー、あん・さき"],
+            ["00:37", "「本当の自分」", "スプレー、あん・さき"],
             ["01:25", "お世辞にも...", "大字準備、さえ・ひで"],
             ["01:30", "「白か黒で答えろ」", "大字、さえ・ひで"],
-            ["01:42", "僕らはまた迷っている", "色②準備、あん・るな"],
+            ["01:42", "迷っている", "色②準備、あん・るな"],
             ["01:50", "白と黒のその間に", "色②、あん・るな"],
+            ["02:09", "今 君に贈るよ", "決め、全員"],
             ["02:38", "「まだ歩き続けたい」", "大字準備、さき・みゆ"],
             ["02:47", "知らぬ間に...", "大字、さき・みゆ"],
             ["02:58", "君の分まで...", "文字準備、あん・ひで"],
             ["03:11", "果てしない旅路の果てに", "文字、あん・ひで"],
-            ["03:45", "もうどんな場所にいても", "色③準備、みゆ・さえ"],
+            ["03:45", "光を感じれるよ", "色③準備、みゆ・さえ"],
             ["03:53", "♪ (Instrumental)", "色③、みゆ・さえ"],
             ["03:54", "♪ (Instrumental)", "書道部文字準備、さき"],
             ["04:04", "今 君に贈るよ", "書道部文字、さき"],
             ["04:31", "lalalala", "大字準備、あん・ひな"],
-            ["04:47", "一番きれいな色って...", "大字、あん・ひな"],
+            ["04:47", "一番きれいな色って", "大字、あん・ひな"],
             ["05:30", "♪ (Instrumental)", "大字準備、るな・ひで"],
             ["05:40", "辿り着く果てまで", "大字、るな・ひで"],
-            ["05:56", "広げた腕で...", "文字準備、ひな・みゆ"],
+            ["05:56", "広げた腕で待っている", "文字準備、ひな・みゆ"],
             ["06:12", "記録を付けては体温", "文字、ひな・みゆ"],
             ["06:28", "あぁ 認めたくないな", "大字準備、あん・さき"],
             ["06:35", "辿り着く果てなんて", "大字、あん・さき"],
             ["06:56", "綺麗な花もいいけど", "色④準備、ひで・ひな"],
             ["07:05", "(Whoa, whoa-oh-oh)", "色④、ひで・ひな"],
             ["07:15", "良い人なんかじゃないよ", "文字準備、さき・さえ"],
-            ["08:10", "本当に我々は...", "文字準備、るな・ひな"],
+            ["08:10", "遠回りする生き物", "文字準備、るな・ひな"],
             ["08:21", "嫌気がさすよ 共々", "文字、るな・ひな"],
             ["08:42", "♪ (Instrumental)", "色⑤準備、さき・さえ"],
             ["08:53", "♪ (Instrumental)", "色⑤、さき・さえ"],
             ["09:05", "いつの日にか...", "大字準備、ひな"],
-            ["09:13", "綺麗な花もいいけど", "大字、ひな"],
-            ["09:27", "そう 今こそ 生まれてきた意味を刻む時だ", "立ち上げ、みんな"]
+            ["09:13", "傷をも誇れる花に", "大字、ひな"],
+            ["09:27", "意味を刻む時だ", "立ち上げ、みんな"]
         ];
 
-        function toSeconds(timeStr) {
-            const parts = timeStr.trim().split(':').reverse();
-            let s = parseInt(parts[0], 10) + (parseInt(parts[1], 10) * 60);
-            if (parts[2]) s += (parseInt(parts[2], 10) * 3600);
-            return s;
-        }
-
-        const dataWithSeconds = myData.map(d => ({
-            seconds: toSeconds(d[0]),
-            memo: d[2]
-        }));
-
         let player;
-        let isApiReady = false;
         const container = document.getElementById('monitor-container');
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
@@ -150,38 +124,39 @@
             player = new YT.Player('player', {
                 videoId: 'lN17WxlwdTY',
                 playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'playsinline': 1 },
-                events: { 
-                    'onReady': () => {
-                        isApiReady = true;
-                        setInterval(updateMonitor, 200);
-                    }
-                }
+                events: { 'onReady': () => setInterval(updateMonitor, 200) }
             });
         }
 
+        // 最初の開始ボタン
+        function startPerformance(e) {
+            e.stopPropagation(); // 2重クリック防止
+            document.getElementById('start-overlay').style.display = 'none';
+            container.style.display = 'block';
+            player.playVideo();
+        }
+
+        // 進行中の再生・停止
         function togglePlay() {
-            if (!isApiReady) return;
+            if (!player || typeof player.getPlayerState !== 'function') return;
             const state = player.getPlayerState();
-            if (state === 1) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
-            }
+            if (state === 1) player.pauseVideo();
+            else player.playVideo();
         }
 
         function updateMonitor() {
             const currentTime = player.getCurrentTime();
             let currentMemo = "";
-            for (let i = 0; i < dataWithSeconds.length; i++) {
-                const item = dataWithSeconds[i];
-                const nextItem = dataWithSeconds[i + 1];
-                if (currentTime >= item.seconds && (!nextItem || currentTime < nextItem.seconds)) {
-                    currentMemo = item.memo;
+            const dataSec = myData.map(d => ({s: toSeconds(d[0]), m: d[2]}));
+            
+            for (let i = 0; i < dataSec.length; i++) {
+                if (currentTime >= dataSec[i].s && (!dataSec[i+1] || currentTime < dataSec[i+1].s)) {
+                    currentMemo = dataSec[i].m;
                     break;
                 }
             }
 
-            if (currentMemo && currentMemo.trim() !== "") {
+            if (currentMemo) {
                 let parts = currentMemo.split(/[、]/);
                 let action = parts[0] || "";
                 let names = (parts[1] || "").replace(/・/g, '\n');
@@ -193,19 +168,21 @@
                 if (isPrep) container.classList.add('is-prep');
                 else container.classList.remove('is-prep');
 
-                let colorBase = "purple";
-                if (currentMemo.includes("大字")) colorBase = "red";
-                else if (currentMemo.includes("色")) colorBase = "blue";
-                else if (currentMemo.includes("文字")) colorBase = "green";
-                else if (currentMemo.includes("スプレー")) colorBase = "orange";
-
-                document.body.className = "bg-" + colorBase + (isPrep ? "-prep" : "");
+                let base = "purple";
+                if (currentMemo.includes("大字")) base = "red";
+                else if (currentMemo.includes("色")) base = "blue";
+                else if (currentMemo.includes("文字")) base = "green";
+                else if (currentMemo.includes("スプレー")) base = "orange";
+                document.body.className = "bg-" + base + (isPrep ? "-prep" : "");
             } else {
                 document.body.className = "bg-black";
-                actionEl.innerText = "（進行中）";
-                nameEl.innerText = "";
-                container.classList.remove('is-prep');
+                actionEl.innerText = ""; nameEl.innerText = "";
             }
+        }
+
+        function toSeconds(t) {
+            const p = t.split(':').reverse();
+            return parseInt(p[0]) + (parseInt(p[1]) * 60);
         }
     </script>
 </body>
