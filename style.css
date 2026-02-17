@@ -1,248 +1,296 @@
-/* --- 共通設定 --- */ 
-body {  
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;  
-    background: #e8e4df;  
-    color: #000;  
-    margin: 0;  
-    padding: 20px; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-} 
+@charset "UTF-8";
 
-/* ページ全体の幅制限 */ 
-.page-wrapper { 
-    width: 100%; 
-    max-width: 1000px; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-} 
+/* =========================================
+   1. 共通・リスト画面・管理画面用スタイル
+   (index.html, 01.htmlなどで使用)
+   ========================================= */
 
-h1 { 
-    font-size: 2.2em; 
-    border-bottom: 3px solid #000; 
-    display: inline-block; 
-    margin-bottom: 40px; 
-    padding: 0 20px 10px; 
-    text-align: center; 
-} 
+/* --- 基本設定 --- */
+body {
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    background: #e8e4df;
+    color: #000;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-/* --- コンポーネント：ボタン系 --- */ 
-.btn { 
-    display: inline-block; 
-    text-decoration: none; 
-    color: #000; 
-    border: 1px solid #000; 
-    padding: 8px 20px; 
-    background: #fff; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    font-size: 0.9em; 
-    text-align: center; 
-} 
+/* ページ全体の幅制限 */
+.page-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-.btn:hover { 
-    background: #000; 
-    color: #fff; 
-} 
+h1 {
+    font-size: 2.2em;
+    border-bottom: 3px solid #000;
+    display: inline-block;
+    margin-bottom: 40px;
+    padding: 0 20px 10px;
+    text-align: center;
+}
 
-.btn-admin { background: #a40000; color: #fff; border: none; } /* 強調用 */ 
+/* --- ボタン共通 --- */
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    color: #000;
+    border: 1px solid #000;
+    padding: 8px 20px;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9em;
+    text-align: center;
+    border-radius: 4px;
+}
+.btn:hover {
+    background: #f0f0f0;
+}
 
-.back-link { margin-top: 30px; } 
+/* --- リスト表示エリア --- */
+.app-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
 
-/* --- ホーム画面：カード --- */ 
-.container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; } 
-.card { 
-    background: #fff; border: 1px solid #000; width: 280px; padding: 30px; 
-    text-decoration: none; color: #000; transition: 0.3s; position: relative; 
-    box-sizing: border-box; /* 崩れ防止に追加 */
-} 
-.card:hover { transform: translateY(-5px); box-shadow: 10px 10px 0 #000; } 
-.card h2 { font-size: 1.4em; margin: 0 0 15px; border-left: 5px solid #000; padding-left: 10px; } 
-.hanko { 
-    border: 2px solid #a40000; color: #a40000; width: 45px; height: 45px; 
-    display: flex; align-items: center; justify-content: center; 
-    font-weight: bold; font-size: 0.8em; margin-left: auto; transform: rotate(-5deg); 
-} 
+.player-section {
+    flex: 1;
+    min-width: 300px;
+}
 
-/* --- 解析ページ：プレイヤー＆リスト --- */ 
-.app-container { display: flex; flex-wrap: wrap; gap: 20px; width: 100%; } 
-.player-section { flex: 1.2; min-width: 320px; } 
-.video-container { width: 100%; aspect-ratio: 16 / 9; background: #000; border: 1px solid #000; } 
-.list-section {  
-    flex: 0.8; min-width: 320px; background: #fff; border: 1px solid #000;  
-    max-height: 70vh; overflow-y: auto;  
-} 
+.list-section {
+    flex: 1;
+    min-width: 300px;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #000;
+    max-height: 60vh;
+    overflow-y: auto;
+}
 
-/* リストアイテム */ 
-.timestamp-item {  
-    display: flex; flex-direction: column; padding: 12px 10px;  
-    border-bottom: 1px solid #eee; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent; 
-} 
-.timestamp-item:hover { background: #f5f5f5; border-left: 4px solid #000; } 
-.timestamp-item.playing { background: #eef6ff; border-left: 4px solid #007bff; font-weight: bold; } 
-.time-badge { background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; margin-right: 12px; border-radius: 4px; } 
+/* --- タイムスタンプリストのアイテム --- */
+.timestamp-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.timestamp-item:hover {
+    background: #f9f9f9;
+}
+/* 再生中のハイライト */
+.timestamp-item.playing {
+    background: #e6f7ff;
+    border-left: 5px solid #007bff;
+}
+
+.item-main {
+    display: flex;
+    align-items: baseline;
+}
+.time-badge {
+    font-weight: bold;
+    margin-right: 10px;
+    font-family: monospace;
+}
 
 /* --- メモの色分け設定 --- */
-.memo-content { 
-    margin-top: 5px; 
-    margin-left: 55px; 
-    font-size: 0.85rem; 
-    font-weight: bold; 
-    color: #666; /* 指定がない時のデフォルト色 */
-} 
-
-/* メモが空なら非表示 */
+.memo-content {
+    margin-top: 5px;
+    margin-left: 55px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #666; /* デフォルト */
+}
 .memo-content:empty { display: none; }
 
-/* JavaScriptから付与される色分けクラス */
+/* JSから付与される色クラス */
 .memo-color-1 { color: #d9534f !important; } /* 赤：大字 */
 .memo-color-2 { color: #007bff !important; } /* 青：色 */
 .memo-color-3 { color: #28a745 !important; } /* 緑：文字 */
 .memo-color-4 { color: #fd7e14 !important; } /* 橙：スプレー */
 .memo-color-5 { color: #6f42c1 !important; } /* 紫：その他 */
 
-/* --- 管理者用ツール共通 --- */ 
-.admin-box { background: #fff; border: 1px solid #000; padding: 25px; width: 100%; box-sizing: border-box; } 
-.admin-box textarea { width: 100%; height: 150px; margin: 10px 0; padding: 10px; box-sizing: border-box; font-family: monospace; } 
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; } 
-.admin-table th, .admin-table td { border: 1px solid #ccc; padding: 10px; } 
-.admin-table input { width: 100%; border: none; padding: 5px; box-sizing: border-box; background: #f9f9f9; } 
+/* --- 管理者用ツール共通 --- */
+.admin-box {
+    background: #fff;
+    border: 1px solid #000;
+    padding: 25px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+.admin-box textarea {
+    width: 100%;
+    height: 150px;
+    margin: 10px 0;
+    padding: 10px;
+    box-sizing: border-box;
+}
 
-pre#result, #output {  
-    background: #333; color: #fff; padding: 20px; white-space: pre-wrap;  
-    display: none; margin-top: 20px; font-size: 0.9em;  
-} 
-
-/* 管理者用フッター */ 
-.admin-footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid #ccc; width: 100%; text-align: center; } 
-.admin-footer p { font-size: 0.9em; color: #666; }
 
 /* =========================================
-   モニター画面（01-screen.html）専用スタイル
+   2. モニター画面（01-screen.html）専用スタイル
    ========================================= */
 
-/* 全要素に「枠線やパディングを含めたサイズ計算」を強制 */
+/* 全要素に「サイズ計算に枠線を含める」設定 */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-/* モニター画面の基本設定 */
+/* モニター画面の基本設定：スクロールを物理的に封じる */
 body.monitor-body {
     color: #ffffff !important;
     background-color: #000000;
+    font-family: "Hiragino Sans", "Meiryo", sans-serif; /* モニターは見やすいゴシック体推奨 */
     
-    /* 画面いっぱいに固定する最強設定 */
-    position: fixed; /* これでスクロール自体を封印 */
+    /* 画面位置を強制固定 */
+    position: fixed; 
     top: 0;
     left: 0;
-    width: 100%;   /* 100vwだとスクロールバー分はみ出すことがあるので%にする */
-    height: 100%;  /* 一旦100%にして */
-    height: 100dvh; /* 対応ブラウザならアドレスバー除外の高さを指定 */
     
-    overflow: hidden; /* はみ出た部分は完全に隠す */
-    margin: 0;
-    padding: 0;
+    /* 幅と高さの指定 */
+    width: 100%;
+    height: 100%;       
+    height: 100dvh;     /* スマホ・タブレットのアドレスバーを除いた実質の高さ */
+    
+    /* はみ出し防止 */
+    overflow: hidden; 
+    margin: 0 !important;
+    padding: 0 !important;
     
     display: flex;
     flex-direction: column;
 }
 
-/* コンテンツエリア */
+/* コンテンツエリア：余白を最小限に */
 #monitor-container {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* 垂直方向中央 */
+    align-items: center;     /* 水平方向中央 */
     text-align: center;
+    
     width: 100%;
-    min-height: 0; /* Flexboxの縮小を許可 */
+    min-height: 0; /* 縮小を許可 */
     overflow: hidden;
-    padding: 0 10px; /* 左右に少し余白 */
+    padding: 5px; /* 画面端との余白 */
 }
 
-/* コントロールバー */
+/* コントロールバー：高さを90pxまで圧縮 */
 #controls {
-    /* 固定高さ */
-    height: 140px; 
-    flex-shrink: 0; /* 絶対に縮まない */
+    height: 90px;
+    flex-shrink: 0; /* 絶対に縮めさせない */
+    
     width: 100%;
     background: rgba(0,0,0,0.8);
     border-top: 1px solid rgba(255,255,255,0.3);
+    
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 1500;
-    padding-bottom: 20px; /* 下の余白 */
+    
+    /* 余白調整 */
+    padding-bottom: 10px; 
+    padding-top: 5px;
 }
 
-/* --- 以下、ボタンなどのパーツ（変更なし） --- */
+/* スタートボタン */
 .big-start-btn {
-    font-size: 3rem; font-weight: bold; color: #000; background-color: #fff;
-    padding: 3rem 5rem; border-radius: 100px; cursor: pointer;
-    box-shadow: 0 0 30px rgba(255,255,255,0.8); text-align: center; margin-bottom: 10vh;
+    font-size: 3rem; 
+    font-weight: bold; 
+    color: #000; 
+    background-color: #fff;
+    padding: 3rem 5rem; 
+    border-radius: 100px; 
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255,255,255,0.8); 
+    text-align: center; 
+    margin-bottom: 10vh;
 }
-.big-start-btn:active { transform: scale(0.95); }
+.big-start-btn:active {
+    transform: scale(0.95);
+}
 
+/* 全画面オーバーレイ */
 #start-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: #000000; display: flex; justify-content: center; align-items: center; z-index: 9999;
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background-color: #000000; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 9999;
 }
 
+/* 戻るボタン（白背景・黒文字・枠線あり） */
 #back-to-index-btn {
-    position: fixed; top: 20px; left: 20px; z-index: 2000;
-    background-color: #ffffff !important; color: #000000 !important; border: 1px solid #000000 !important;
-    padding: 8px 20px; text-decoration: none; font-size: 0.9em; cursor: pointer;
+    position: fixed; 
+    top: 15px; 
+    left: 15px; 
+    z-index: 2000;
+    
+    /* 共通デザイン(.btn)を強制適用しつつカスタマイズ */
+    background-color: #ffffff !important; 
+    color: #000000 !important; 
+    border: 1px solid #000000 !important;
+    padding: 5px 15px; 
+    text-decoration: none; 
+    font-size: 0.8em; 
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
 }
 
+/* 全画面ボタン */
 #fullscreen-btn {
-    position: fixed; top: 20px; right: 20px; z-index: 2000;
-    color: rgba(255,255,255,0.6); background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.3);
-    padding: 8px 20px; border-radius: 5px; cursor: pointer; font-size: 1.2rem;
+    position: fixed; 
+    top: 15px; 
+    right: 15px; 
+    z-index: 2000;
+    color: rgba(255,255,255,0.6); 
+    background: rgba(0,0,0,0.4); 
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 15px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 1rem;
 }
 
-/* 背景色 */
+/* --- 背景色設定（文字色白） --- */
 .bg-black { background-color: #000000 !important; }
-.bg-red { background-color: #cc0000 !important; }
-.bg-blue { background-color: #0044cc !important; }
-.bg-green { background-color: #008800 !important; }
+.bg-red    { background-color: #cc0000 !important; }
+.bg-blue   { background-color: #0044cc !important; }
+.bg-green  { background-color: #008800 !important; }
 .bg-orange { background-color: #dd6600 !important; }
 .bg-purple { background-color: #6600cc !important; }
-.bg-red-prep { background-color: #660000 !important; }
-.bg-blue-prep { background-color: #002244 !important; }
-.bg-green-prep { background-color: #003300 !important; }
+
+/* 準備中の点滅背景 */
+.bg-red-prep    { background-color: #660000 !important; }
+.bg-blue-prep   { background-color: #002244 !important; }
+.bg-green-prep  { background-color: #003300 !important; }
 .bg-orange-prep { background-color: #663300 !important; }
 .bg-purple-prep { background-color: #2d1a4d !important; }
-@keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-.is-prep { animation: flash-prep 1.5s infinite; }
 
-/* 全画面切り替えボタン（右上に配置） */
-#fullscreen-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
-    color: rgba(255,255,255,0.6);
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 5px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2rem;
+@keyframes flash-prep { 
+    0%, 100% { opacity: 1; } 
+    50% { opacity: 0.6; } 
 }
-#fullscreen-btn:hover {
-    color: #fff;
-    background: rgba(0,0,0,0.7);
-}
-
-/* モバイル横向き時にアドレスバーを隠すための補助設定 */
-@media screen and (orientation: landscape) {
-    body.monitor-body {
-        min-height: 100vh;
-        /* モバイルブラウザのアドレスバー対策 */
-        min-height: -webkit-fill-available; 
-    }
+.is-prep { 
+    animation: flash-prep 1.5s infinite; 
 }
