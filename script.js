@@ -1,70 +1,99 @@
 /**
- * アプリケーションの初期化
- * @param {Array} data - myData（[時間, 歌詞, メモ]）の配列
- * @param {string} videoElementId - 動画要素のID（HTML5 video用、YouTubeの場合はnullでも可）
+ * 共通ユーティリティ: 時間文字列を秒数に変換
+ * 例: "01:23" -> 83
  */
+function parseTime(timeStr) {
+    if (!timeStr) return 0;
+    const parts = timeStr.trim().split(':').reverse();
+    let seconds = parseInt(parts[0], 10) + (parseInt(parts[1] || 0, 10) * 60);
+    if (parts[2]) seconds += (parseInt(parts[2], 10) * 3600);
+    return seconds;
+}
+
+/**
+ * 共通ユーティリティ: メモからアクションタイプと色情報を取得
+ * 戻り値: { type: string, colorClass: string, bgClass: string, isPrep: boolean }
+ */
+function getMemoInfo(memo) {
+    if (!memo) return { type: "normal", colorClass: "", bgClass: "bg-black", isPrep: false };
+    
+    const m = memo.trim();
+    const isPrep = m.includes("準備");
+    
+    let colorClass = "memo-color-5"; // デフォルト（紫/その他）
+    let bgBase = "purple";           // デフォルト背景色
+
+    if (m.includes("大字")) {
+        colorClass = "memo-color-1"; // 赤
+        bgBase = "red";
+    } else if (m.includes("色")) {
+        colorClass = "memo-color-2"; // 青
+        bgBase = "blue";
+    } else if (m.includes("文字")) {
+        colorClass = "memo-color-3"; // 緑
+        bgBase = "green";
+    } else if (m.includes("スプレー")) {
+        colorClass = "memo-color-4"; // 橙
+        bgBase = "orange";
+    }
+
+    // "bg-red" または "bg-red-prep" のようなクラス名を生成
+    const bgClass = `bg-${bgBase}${isPrep ? "-prep" : ""}`;
+
+    return { 
+        type: bgBase, 
+        colorClass: colorClass, 
+        bgClass: bgClass, 
+        isPrep: isPrep 
+    };
+}
+
+// -------------------------------------------------------
+// 以下、リスト表示用ロジック (元のinitAppを修正して維持)
+// -------------------------------------------------------
+
 function initApp(data, videoElementId) {
     const video = document.getElementById(videoElementId);
     const listElement = document.getElementById('timestamp-list');
     const items = [];
 
-    listElement.innerHTML = ""; // リストの初期化
+    if(listElement) listElement.innerHTML = "";
 
     data.forEach(([timeStr, text, memo]) => {
-        // --- 1. 時間（"01:23"）を秒数に変換 ---
-        const parts = timeStr.trim().split(':').reverse();
-        let seconds = parseInt(parts[0], 10) + (parseInt(parts[1], 10) * 60);
-        if (parts[2]) seconds += (parseInt(parts[2], 10) * 3600);
+        // 共通関数を使用
+        const seconds = parseTime(timeStr);
+        const info = getMemoInfo(memo);
 
-        // --- 2. メモの内容に応じた5色の色分け判定 ---
-        let colorClass = "";
-        if (memo) {
-            const m = memo.trim();
-            // 修正ポイント：includes("...") の後の ) を追加しました
-            if (m.includes("大字")) {
-                colorClass = "memo-color-1"; // 赤
-            } else if (m.includes("色")) {
-                colorClass = "memo-color-2"; // 青
-            } else if (m.includes("文字")) {
-                colorClass = "memo-color-3"; // 緑
-            } else if (m.includes("スプレー")) {
-                colorClass = "memo-color-4"; // オレンジ
-            } else {
-                colorClass = "memo-color-5"; // 紫（その他：人名など）
-            }
+        // リストアイテム生成（リスト表示画面用）
+        if (listElement) {
+            const item = document.createElement('div');
+            item.className = 'timestamp-item';
+            // info.colorClass を使用
+            item.innerHTML = `
+                <div class="item-main">
+                    <span class="time-badge">${timeStr}</span>
+                    <span class="text-content">${text}</span>
+                </div>
+                <div class="memo-content ${info.colorClass}">${memo || ''}</div>
+            `;
+            
+            item.onclick = () => {
+                if (window.player && window.player.seekTo) {
+                    window.player.seekTo(seconds, true);
+                    window.player.playVideo();
+                } else if (video) {
+                    video.currentTime = seconds;
+                    video.play();
+                }
+            };
+
+            listElement.appendChild(item);
+            items.push({ seconds, element: item });
         }
-
-        // --- 3. HTML要素の生成 ---
-        const item = document.createElement('div');
-        item.className = 'timestamp-item';
-        item.innerHTML = `
-            <div class="item-main">
-                <span class="time-badge">${timeStr}</span>
-                <span class="text-content">${text}</span>
-            </div>
-            <div class="memo-content ${colorClass}">${memo || ''}</div>
-        `;
-        
-        // --- 4. クリックイベント（動画の再生位置移動） ---
-        item.onclick = () => {
-            if (window.player && window.player.seekTo) {
-                window.player.seekTo(seconds, true);
-                window.player.playVideo();
-            } else if (video) {
-                video.currentTime = seconds;
-                video.play();
-            }
-        };
-
-        listElement.appendChild(item);
-        items.push({ seconds, element: item });
     });
 
-    /**
-     * 現在の再生時間に合わせてハイライトと自動スクロールを更新
-     */
     const updateHighlight = (currentTime) => {
-        if (currentTime === undefined) return;
+        if (currentTime === undefined || !listElement) return;
         
         items.forEach((item, index) => {
             const nextItem = items[index + 1];
