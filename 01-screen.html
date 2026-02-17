@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>モニターPro - 歌詞・操作対応</title>
+    <title>モニターPro - 表示維持モデル</title>
     <style>
         body {
             margin: 0;
@@ -31,7 +31,7 @@
         }
         #start-btn {
             padding: 20px 40px;
-            font-size: 30px;
+            font-size: 24px;
             background: #fff;
             color: #000;
             border-radius: 50px;
@@ -46,10 +46,17 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            pointer-events: none; /* 下のコントロールに干渉しないよう */
+            pointer-events: none;
         }
 
-        #lyrics-guide { font-size: 3vw; color: rgba(255,255,255,0.7); margin-bottom: 2vh; font-style: italic; }
+        #lyrics-guide { 
+            font-size: 3.5vw; 
+            color: rgba(255,255,255,0.8); 
+            margin-bottom: 3vh; 
+            min-height: 1.2em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
         #action-label { font-size: 6vw; font-weight: bold; margin-bottom: 1vh; }
         #name-label { font-size: 16vw; font-weight: 900; line-height: 1.1; white-space: pre-wrap; }
 
@@ -58,29 +65,29 @@
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: rgba(0,0,0,0.6);
-            padding: 20px 0;
+            background: rgba(0,0,0,0.7);
+            padding: 15px 0 30px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             z-index: 1500;
         }
 
-        #seek-bar { width: 90%; cursor: pointer; height: 30px; }
-        .btn-row { display: flex; gap: 30px; margin-top: 10px; }
+        #seek-bar { width: 90%; cursor: pointer; height: 40px; margin-bottom: 10px; }
+        .btn-row { display: flex; gap: 40px; }
         .ctrl-btn {
             background: rgba(255,255,255,0.2);
-            border: 1px solid #fff;
+            border: 2px solid #fff;
             color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 10px 30px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: bold;
         }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.4); }
 
         /* アニメーションと背景 */
-        @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes flash-prep { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .is-prep { animation: flash-prep 1.5s infinite; }
 
         .bg-red { background-color: #ff0000; } .bg-red-prep { background-color: #660000; }
@@ -96,11 +103,11 @@
 <body>
 
     <div id="start-overlay" onclick="startPerformance()">
-        <div id="start-btn">練習を開始する</div>
+        <div id="start-btn">練習を開始する（タップ）</div>
     </div>
 
     <div id="monitor-container">
-        <div id="lyrics-guide">（歌詞ガイド）</div>
+        <div id="lyrics-guide"></div>
         <span id="action-label">READY</span>
         <span id="name-label">...</span>
     </div>
@@ -170,7 +177,7 @@
             ["08:42", "♪ (Instrumental)", "色⑤準備、さき・さえ"],
             ["08:53", "♪ (Instrumental)", "色⑤、さき・さえ"],
             ["09:05", "いつの日にか あの朝も 消えるんだろうか", "大字準備、ひな"],
-            ["09:13", "綺麗な花もいいけど", "大字、ひな"],
+            ["09:13", "綺麗な花もいいけど", "大字,ひな"],
             ["09:27", "意味を刻む時だ", "立ち上げ、みんな"]
         ];
 
@@ -179,6 +186,7 @@
         const actionEl = document.getElementById('action-label');
         const nameEl = document.getElementById('name-label');
         const seekBar = document.getElementById('seek-bar');
+        const container = document.getElementById('monitor-container');
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
@@ -191,11 +199,7 @@
         function onPlayerReady() {
             seekBar.max = player.getDuration();
             setInterval(updateMonitor, 200);
-            
-            // シークバー操作
-            seekBar.addEventListener('input', () => {
-                player.seekTo(seekBar.value);
-            });
+            seekBar.addEventListener('input', () => player.seekTo(seekBar.value));
         }
 
         function startPerformance() {
@@ -222,23 +226,30 @@
             const currentTime = player.getCurrentTime();
             seekBar.value = currentTime;
             
+            let lastMemoIndex = -1;
             let currentLyrics = "";
-            let currentMemo = "";
             
             const dataSec = myData.map(d => ({s: toSeconds(d[0]), l: d[1], m: d[2]}));
             
             for (let i = 0; i < dataSec.length; i++) {
-                if (currentTime >= dataSec[i].s && (!dataSec[i+1] || currentTime < dataSec[i+1].s)) {
+                if (currentTime >= dataSec[i].s) {
                     currentLyrics = dataSec[i].l;
-                    currentMemo = dataSec[i].m;
+                    // メモ（役割）が入っている最新のインデックスを保持
+                    if (dataSec[i].m && dataSec[i].m.trim() !== "") {
+                        lastMemoIndex = i;
+                    }
+                } else {
                     break;
                 }
             }
 
-            lyricsEl.innerText = currentLyrics || "♪ (Instrumental)";
+            // 歌詞の表示
+            lyricsEl.innerText = currentLyrics || "";
 
-            if (currentMemo) {
-                let parts = currentMemo.split(/[、]/);
+            // 役割の表示維持ロジック
+            if (lastMemoIndex !== -1) {
+                let memo = dataSec[lastMemoIndex].m;
+                let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
                 let names = (parts[1] || "").replace(/・/g, '\n');
                 let isPrep = action.includes("準備");
@@ -246,18 +257,19 @@
                 actionEl.innerText = action;
                 nameEl.innerText = names;
 
-                if (isPrep) document.getElementById('monitor-container').classList.add('is-prep');
-                else document.getElementById('monitor-container').classList.remove('is-prep');
+                if (isPrep) container.classList.add('is-prep');
+                else container.classList.remove('is-prep');
 
                 let base = "purple";
-                if (currentMemo.includes("大字")) base = "red";
-                else if (currentMemo.includes("色")) base = "blue";
-                else if (currentMemo.includes("文字")) base = "green";
-                else if (currentMemo.includes("スプレー")) base = "orange";
+                if (memo.includes("大字")) base = "red";
+                else if (memo.includes("色")) base = "blue";
+                else if (memo.includes("文字")) base = "green";
+                else if (memo.includes("スプレー")) base = "orange";
                 document.body.className = "bg-" + base + (isPrep ? "-prep" : "");
             } else {
                 document.body.className = "bg-black";
-                actionEl.innerText = ""; nameEl.innerText = "";
+                actionEl.innerText = "READY";
+                nameEl.innerText = "";
             }
         }
 
