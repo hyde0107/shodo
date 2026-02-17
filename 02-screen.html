@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* 01-screen.html と同じスタイル設定 */
+        /* 01-screen.html 3.txt のスタイルを継承 */
         #lyrics-guide { 
             font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
             font-size: 3.5vmin;
@@ -37,7 +37,19 @@
             word-wrap: break-word;
         }
         .btn-row { display: flex; gap: 15px; width: 95%; max-width: 600px; justify-content: center; }
-        #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
+        
+        /* 【重要】動画同期バグ対策
+           visibility: hidden; だとブラウザが更新を止めてしまうため、
+           opacity: 0; で「見えないが存在する」状態にします。
+        */
+        #player-wrapper { 
+            position: fixed;
+            top: 0; left: 0;
+            width: 1px; height: 1px;
+            opacity: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="monitor-body bg-black">
@@ -78,8 +90,7 @@
     <script src="data02.js"></script>
 
     <script>
-        // --- 必要な機能をすべて内蔵（script.jsなしでも動くようにする） ---
-
+        // --- 設定・準備 ---
         const video = document.getElementById('video-player');
         const lyricsEl = document.getElementById('lyrics-guide');
         const actionEl = document.getElementById('action-label');
@@ -87,21 +98,31 @@
         const seekBar = document.getElementById('seek-bar');
         const container = document.getElementById('monitor-container');
 
-        // 時間変換関数（"MM:SS" -> 秒）
+        // エラーチェック: data02.js が正しく読み込まれたか？
+        let dataSec = [];
+        if (typeof performanceData02 === 'undefined') {
+            alert("【エラー】data02.js が読み込めませんでした。\nHTMLと同じフォルダに data02.js があるか確認してください。");
+            nameEl.innerText = "DATA ERROR";
+        } else {
+            // データを秒数変換して準備
+            dataSec = performanceData02.map(d => ({
+                s: parseTime(d[0]), l: d[1], m: d[2]
+            }));
+        }
+
+        // 時間変換関数 ("01:23" -> 83秒)
         function parseTime(timeStr) {
             if (!timeStr) return 0;
             const parts = timeStr.split(':');
             return parseInt(parts[0]) * 60 + parseInt(parts[1]);
         }
 
-        // 色判定ロジック（安全版）
-        // メモの中に色名が含まれていればその色を、なければ黒を返す
-        function getMemoInfoSafe(memo) {
+        // 色判定ロジック (script.jsがなくても動くように内蔵)
+        function getMemoInfo(memo) {
             let bgClass = "bg-black";
             let isPrep = false;
-
             if (!memo) return { bgClass, isPrep };
-
+            
             if (memo.includes("赤")) bgClass = "bg-red";
             else if (memo.includes("青")) bgClass = "bg-blue";
             else if (memo.includes("緑")) bgClass = "bg-green";
@@ -109,58 +130,39 @@
             else if (memo.includes("紫")) bgClass = "bg-purple";
             else if (memo.includes("準備")) {
                 isPrep = true;
-                // 準備中の色判定（簡易）
                 if (memo.includes("赤")) bgClass = "bg-red-prep";
                 else if (memo.includes("青")) bgClass = "bg-blue-prep";
-                else bgClass = "bg-black"; // デフォルト
+                else bgClass = "bg-black";
             }
-            
             return { bgClass, isPrep };
         }
 
-        // データの準備
-        // performanceData02 が読み込めているかチェック
-        let dataSec = [];
-        if (typeof performanceData02 !== 'undefined') {
-            dataSec = performanceData02.map(d => ({
-                s: parseTime(d[0]), l: d[1], m: d[2]
-            }));
-        } else {
-            alert("エラー: data02.js が正しく読み込まれていません。");
-        }
+        // --- イベント設定 ---
 
-        // 動画のメタデータ読み込み完了時
+        // 動画の長さがわかったらシークバー設定
         video.addEventListener('loadedmetadata', () => {
             seekBar.max = video.duration;
         });
 
-        // 定期更新（同期の要）
-        setInterval(updateMonitor, 100); // 更新頻度を上げて滑らかに
+        // 【重要】同期の要：setIntervalで強制的に画面を更新する (100ms毎)
+        // videoのtimeupdateイベントだけだと、画面オフ時などに止まることがあるため
+        setInterval(updateMonitor, 100);
 
         // シークバー操作
         seekBar.addEventListener('input', () => {
             video.currentTime = seekBar.value;
         });
 
-        // 全画面切り替え
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-                else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            }
-        }
-
-        // 開始処理
+        // 開始ボタン
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
-            video.play().catch(e => alert("再生エラー: 画面をタップしてください"));
+            video.play().catch(e => {
+                alert("再生エラー: 画面をもう一度タップしてください");
+            });
             document.getElementById('play-pause-btn').innerText = "一時停止";
         }
 
-        // 再生・停止
+        // 再生・一時停止
         function togglePlay() {
             const btn = document.getElementById('play-pause-btn');
             if (!video.paused) {
@@ -181,11 +183,22 @@
             video.currentTime += sec;
         }
 
-        // 画面更新メインロジック
+        // 全画面
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+                else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        }
+
+        // --- 画面更新ロジック (メイン) ---
         function updateMonitor() {
             const currentTime = video.currentTime;
             
-            // シークバーの見た目を更新（操作中以外）
+            // シークバーの更新 (操作中以外)
             if(document.activeElement !== seekBar) {
                 seekBar.value = currentTime;
             }
@@ -193,16 +206,15 @@
             let lastMemoIndex = -1;
             let currentLyrics = "";
 
-            // 現在時刻に対応するデータを探索
+            // 現在の再生時間に対応するデータを探す
             for (let i = 0; i < dataSec.length; i++) {
                 if (currentTime >= dataSec[i].s) {
                     currentLyrics = dataSec[i].l;
-                    // メモがある行を覚える
+                    // メモがある行を記憶
                     if (dataSec[i].m && dataSec[i].m.trim() !== "") {
                         lastMemoIndex = i;
                     }
                 } else {
-                    // 未来のデータになったら終了
                     break;
                 }
             }
@@ -210,12 +222,10 @@
             // 歌詞表示
             lyricsEl.innerText = currentLyrics || "";
 
-            // アクション指示表示
+            // 指示と背景色更新
             if (lastMemoIndex !== -1) {
                 let memo = dataSec[lastMemoIndex].m;
-                
-                // エラー回避版の関数を使用
-                const info = getMemoInfoSafe(memo);
+                const info = getMemoInfo(memo);
                 
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
@@ -232,5 +242,4 @@
         }
     </script>
 </body>
-</html>
 </html>
