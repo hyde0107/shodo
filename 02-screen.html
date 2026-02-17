@@ -2,163 +2,208 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>02 2026三送会 (モニター)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>モニターPro - 02 三送会</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body class="monitor-body">
     
-    <video id="hidden-video" playsinline style="display:none;">
-        <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
-    </video>
+    <style>
+        /* 01-screen.html と全く同じスタイル設定 */
 
-    <div id="start-overlay">
-        <button id="start-btn" class="big-start-btn">START</button>
-    </div>
+        /* 歌詞ガイド：明朝体 */
+        #lyrics-guide { 
+            font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+            font-size: 3.5vmin;
+            color: rgba(255,255,255,0.7) !important;
+            margin-bottom: 1vh;
+            min-height: 1.2em;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+
+        /* アクション指示：ゴシック体 */
+        #action-label { 
+            font-family: "Hiragino Sans", "Meiryo", sans-serif;
+            font-size: 8vmin;
+            font-weight: bold; 
+            margin-bottom: 0vh;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 0.1em;
+            flex-shrink: 0;
+        }
+
+        /* 名前表示：極太ゴシック */
+        #name-label { 
+            font-family: "Hiragino Sans", "Meiryo", sans-serif;
+            font-size: 16vmin; 
+            font-weight: 900; 
+            line-height: 1.1; 
+            white-space: pre-wrap; 
+            text-shadow: 4px 4px 10px rgba(0,0,0,0.8);
+            width: 95%;
+            word-wrap: break-word;
+        }
+
+        .btn-row { 
+            display: flex; 
+            gap: 15px; 
+            width: 95%; 
+            max-width: 600px; 
+            justify-content: center; 
+        }
+        
+        /* プレーヤーは裏で動かすので隠す */
+        #player-wrapper { position: absolute; visibility: hidden; pointer-events: none; }
+    </style>
+</head>
+<body class="monitor-body bg-black">
 
     <div id="header-controls">
         <a href="index.html" id="back-to-index-btn">← 戻る</a>
-        <button id="fullscreen-btn">全画面</button>
+        <button id="fullscreen-btn" onclick="toggleFullScreen()">全画面</button>
     </div>
 
-    <div id="monitor-container">
-        <div style="font-size: 2rem; opacity: 0.7;">待機中...</div>
-    </div>
-
-    <div id="controls">
-        <input type="range" id="seek-bar" value="0" min="0" step="0.1">
-        <div class="btn-row">
-            <button class="ctrl-btn" id="rw-btn">-10秒</button>
-            <button class="ctrl-btn" id="play-pause-btn">PAUSE</button>
-            <button class="ctrl-btn" id="ff-btn">+10秒</button>
+    <div id="start-overlay" onclick="startPerformance()">
+        <div class="big-start-btn">
+            練習開始<br>
+            <span style="font-size:1.2rem; font-weight:normal; display:block; margin-top:10px;">(画面をタップ)</span>
         </div>
     </div>
 
-    <script src="data02.js"></script>
-    <script>
-        const video = document.getElementById('hidden-video');
-        const monitorContainer = document.getElementById('monitor-container');
-        const startOverlay = document.getElementById('start-overlay');
-        const startBtn = document.getElementById('start-btn');
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const seekBar = document.getElementById('seek-bar');
+    <div id="monitor-container">
+        <div id="lyrics-guide"></div>
+        <span id="action-label">READY</span>
+        <span id="name-label">...</span>
+    </div>
+
+    <div id="controls">
+        <input type="range" id="seek-bar" value="0" step="0.1">
+        <div class="btn-row">
+            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
+            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">一時停止</button>
+            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
+        </div>
+    </div>
+    
+    <div id="player-wrapper">
+        <video id="video-player" playsinline>
+            <source src="https://res.cloudinary.com/doqthalka/video/upload/v1771151605/%E4%B8%89%E9%80%81%E4%BC%9A_vag4dh.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="data02.js"></script> <script>
+        // --- 01-screen と同じロジックを videoタグ用に書き換え ---
         
-        let isPlaying = false;
-        let data = performanceData2; // data02.jsから
+        const video = document.getElementById('video-player');
+        const lyricsEl = document.getElementById('lyrics-guide');
+        const actionEl = document.getElementById('action-label');
+        const nameEl = document.getElementById('name-label');
+        const seekBar = document.getElementById('seek-bar');
+        const container = document.getElementById('monitor-container');
 
-        // 時間を秒に変換する関数
-        function parseTime(timeStr) {
-            const parts = timeStr.split(':');
-            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        }
-
-        // データを秒数付きオブジェクトに変換
-        const timeline = data.map(item => ({
-            time: parseTime(item[0]),
-            lyrics: item[1],
-            memo: item[2]
+        // data02.js の performanceData02 を読み込む
+        const dataSec = performanceData02.map(d => ({
+            s: parseTime(d[0]), l: d[1], m: d[2]
         }));
 
-        // --- 画面更新ロジック ---
-        function updateMonitor() {
-            const t = video.currentTime;
-            seekBar.value = t;
-
-            // 現在のインデックスを探す
-            let currentIndex = -1;
-            for (let i = 0; i < timeline.length; i++) {
-                if (t >= timeline[i].time) {
-                    currentIndex = i;
-                } else {
-                    break;
-                }
-            }
-
-            // 表示内容の構築
-            if (currentIndex !== -1) {
-                const cur = timeline[currentIndex];
-                
-                // 背景色の決定 (メモの内容による簡易判定)
-                let bgClass = "bg-black";
-                if (cur.memo.includes("赤")) bgClass = "bg-red";
-                else if (cur.memo.includes("青")) bgClass = "bg-blue";
-                else if (cur.memo.includes("緑")) bgClass = "bg-green";
-                else if (cur.memo.includes("橙")) bgClass = "bg-orange";
-                else if (cur.memo.includes("紫")) bgClass = "bg-purple";
-                
-                // HTML生成 (歌詞メイン、メモを上に小さく)
-                let html = `
-                    <div style="font-size: 1.5rem; color: #ffff00; margin-bottom: 20px;">${cur.memo}</div>
-                    <div style="font-size: 5rem; font-weight: bold; line-height: 1.2;">${cur.lyrics}</div>
-                `;
-
-                // 準備中（次のアクション）の表示 (5秒前くらいから)
-                if (currentIndex + 1 < timeline.length) {
-                    const next = timeline[currentIndex + 1];
-                    const timeToNext = next.time - t;
-                    if (timeToNext < 10 && next.memo) {
-                         // 点滅効果などはCSSの .is-prep で
-                         html += `<div style="margin-top:40px; color:#aaa; font-size:1.5rem;">Next: ${next.memo} (${Math.ceil(timeToNext)})</div>`;
-                    }
-                }
-
-                monitorContainer.innerHTML = html;
-                document.body.className = "monitor-body " + bgClass; // 背景色適用
-
-            } else {
-                monitorContainer.innerHTML = '<div style="font-size: 2rem;">待機中</div>';
-                document.body.className = "monitor-body";
-            }
-        }
-
-        // --- イベントリスナー ---
-
-        // スタートボタン
-        startBtn.addEventListener('click', () => {
-            startOverlay.style.display = 'none';
-            video.play();
-            isPlaying = true;
-            playPauseBtn.textContent = "PAUSE";
-        });
-
-        // 動画の読み込み完了時
+        // 動画の準備ができたらシークバーの最大値を設定
         video.addEventListener('loadedmetadata', () => {
             seekBar.max = video.duration;
         });
 
-        // 時間経過で更新
-        video.addEventListener('timeupdate', updateMonitor);
+        // 常にモニターを更新するループ開始
+        setInterval(updateMonitor, 200);
 
-        // 再生/一時停止
-        playPauseBtn.addEventListener('click', () => {
-            if (isPlaying) {
+        // シークバー操作時
+        seekBar.addEventListener('input', () => {
+            video.currentTime = seekBar.value;
+        });
+
+        // 全画面切り替え
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        // 開始処理
+        function startPerformance() {
+            document.getElementById('start-overlay').style.display = 'none';
+            video.play();
+            document.getElementById('play-pause-btn').innerText = "一時停止";
+        }
+
+        // 再生・停止切り替え
+        function togglePlay() {
+            const btn = document.getElementById('play-pause-btn');
+            if (!video.paused) {
                 video.pause();
-                playPauseBtn.textContent = "PLAY";
+                btn.innerText = "再開";
+                btn.style.backgroundColor = "#fff";
+                btn.style.color = "#000";
             } else {
                 video.play();
-                playPauseBtn.textContent = "PAUSE";
+                btn.innerText = "一時停止";
+                btn.style.backgroundColor = "";
+                btn.style.color = "";
             }
-            isPlaying = !isPlaying;
-        });
+        }
 
-        // シークバー操作
-        seekBar.addEventListener('input', (e) => {
-            video.currentTime = e.target.value;
-            updateMonitor(); // 即時反映
-        });
+        // スキップ機能
+        function skip(sec) {
+            video.currentTime += sec;
+        }
 
-        // 戻る・進む
-        document.getElementById('rw-btn').addEventListener('click', () => video.currentTime -= 10);
-        document.getElementById('ff-btn').addEventListener('click', () => video.currentTime += 10);
-
-        // 全画面
-        document.getElementById('fullscreen-btn').addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                document.exitFullscreen();
+        // 画面更新ロジック（01-screenと全く同じ）
+        function updateMonitor() {
+            const currentTime = video.currentTime;
+            
+            // シークバーを動かしていない時だけ位置を更新
+            // (inputイベントと競合しないよう簡易的に常時更新にしてます)
+            if(document.activeElement !== seekBar) {
+                seekBar.value = currentTime;
             }
-        });
+            
+            let lastMemoIndex = -1;
+            let currentLyrics = "";
+
+            for (let i = 0; i < dataSec.length; i++) {
+                if (currentTime >= dataSec[i].s) {
+                    currentLyrics = dataSec[i].l;
+                    if (dataSec[i].m && dataSec[i].m.trim() !== "") lastMemoIndex = i;
+                } else break;
+            }
+
+            lyricsEl.innerText = currentLyrics || "";
+
+            if (lastMemoIndex !== -1) {
+                let memo = dataSec[lastMemoIndex].m;
+                const info = getMemoInfo(memo); // script.js内の関数を使用
+                
+                let parts = memo.split(/[、]/);
+                let action = parts[0] || "";
+                let names = (parts[1] || "").replace(/・/g, '\n');
+
+                actionEl.innerText = action;
+                nameEl.innerText = names;
+
+                if (info.isPrep) container.classList.add('is-prep');
+                else container.classList.remove('is-prep');
+
+                // 背景色クラスを適用
+                document.body.className = "monitor-body " + info.bgClass;
+            }
+        }
     </script>
 </body>
 </html>
