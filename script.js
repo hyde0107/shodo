@@ -20,16 +20,17 @@ function initApp(data, videoElementId) {
         let colorClass = "";
         if (memo) {
             const m = memo.trim();
-            if (m.includes("大字") {
+            // 修正ポイント：includes("...") の後の ) を追加しました
+            if (m.includes("大字")) {
                 colorClass = "memo-color-1"; // 赤
             } else if (m.includes("色")) {
                 colorClass = "memo-color-2"; // 青
-            } else if (m.includes("文字") {
+            } else if (m.includes("文字")) {
                 colorClass = "memo-color-3"; // 緑
-            } else if (m.includes("スプレー") {
+            } else if (m.includes("スプレー")) {
                 colorClass = "memo-color-4"; // オレンジ
             } else {
-                colorClass = "memo-color-5"; // 紫
+                colorClass = "memo-color-5"; // 紫（その他：人名など）
             }
         }
 
@@ -46,13 +47,10 @@ function initApp(data, videoElementId) {
         
         // --- 4. クリックイベント（動画の再生位置移動） ---
         item.onclick = () => {
-            // YouTube Player API が利用可能な場合
             if (window.player && window.player.seekTo) {
                 window.player.seekTo(seconds, true);
                 window.player.playVideo();
-            } 
-            // 通常の <video> タグの場合
-            else if (video) {
+            } else if (video) {
                 video.currentTime = seconds;
                 video.play();
             }
@@ -70,23 +68,18 @@ function initApp(data, videoElementId) {
         
         items.forEach((item, index) => {
             const nextItem = items[index + 1];
-            // 現在の時間がこのアイテムの開始時間以上、かつ次のアイテムの開始時間未満か判定
             const isPlaying = currentTime >= item.seconds && (!nextItem || currentTime < nextItem.seconds);
             
             if (isPlaying) {
                 if (!item.element.classList.contains('playing')) {
-                    // 他のアイテムのハイライトを解除
                     items.forEach(i => i.element.classList.remove('playing'));
-                    // 自要素にハイライトを付与
                     item.element.classList.add('playing');
-                    // 中央に自動スクロール
                     item.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         });
     };
 
-    // HTML5 video 要素がある場合のイベント登録
     if (video) {
         video.addEventListener('timeupdate', () => updateHighlight(video.currentTime));
     }
