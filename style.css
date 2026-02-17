@@ -123,43 +123,87 @@ pre#result, #output {
    モニター画面（01-screen.html）専用スタイル
    ========================================= */
 
-/* モニター画面での基本テキスト色は白にする（bodyの黒設定を上書き） */
-.bg-black, .bg-red, .bg-blue, .bg-green, .bg-orange, .bg-purple,
-.bg-red-prep, .bg-blue-prep, .bg-green-prep, .bg-orange-prep, .bg-purple-prep {
-    color: #fff;
-}
+/* --- ここから下を既存の内容と差し替えてください --- */
 
-/* --- 背景色定義 --- */
-.bg-black { background-color: #000; }
-
-.bg-red    { background-color: #cc0000; }
-.bg-blue   { background-color: #0044cc; }
-.bg-green  { background-color: #008800; }
-.bg-orange { background-color: #dd6600; }
-.bg-purple { background-color: #6600cc; }
-
-/* --- 準備中（暗めの色） --- */
-.bg-red-prep    { background-color: #660000; }
-.bg-blue-prep   { background-color: #002244; }
-.bg-green-prep  { background-color: #003300; }
-.bg-orange-prep { background-color: #663300; }
-.bg-purple-prep { background-color: #2d1a4d; }
-
-/* --- アニメーション（準備中の点滅） --- */
-@keyframes flash-prep { 
-    0%, 100% { opacity: 1; } 
-    50% { opacity: 0.4; } 
-}
-.is-prep { 
-    animation: flash-prep 1.5s infinite; 
-}
-
-/* --- レイアウト調整 --- */
-/* モニター画面のbody用 */
+/* モニター画面の基本設定 */
 body.monitor-body {
-    height: 100vh;
-    overflow: hidden;
+    color: #ffffff !important;     /* 文字色は常に白 */
+    background-color: #000000;     /* デフォルト背景は黒 */
+    height: 100vh;                 /* 高さを画面ピッタリにする */
+    width: 100vw;
+    overflow: hidden;              /* スクロールバーを完全に隠す */
     margin: 0;
     display: flex;
     flex-direction: column;
+}
+
+/* 開始オーバーレイ（真っ黒背景で画面を覆う） */
+#start-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #000000; /* 不透明な黒 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* 最前面 */
+}
+
+/* 巨大な開始ボタン */
+.big-start-btn {
+    font-size: 4rem; /* とても大きな文字 */
+    font-weight: bold;
+    color: #000;
+    background-color: #fff;
+    padding: 2rem 6rem;
+    border-radius: 100px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,255,255,0.5);
+    transition: transform 0.1s;
+}
+.big-start-btn:active {
+    transform: scale(0.95); /* 押したときに少し凹む */
+}
+
+/* 戻るボタン */
+#back-to-index-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 2000; /* コントロールより上 */
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    font-size: 1.2rem;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 15px;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.3);
+}
+#back-to-index-btn:hover {
+    color: #fff;
+    background: rgba(0,0,0,0.7);
+}
+
+/* 背景色の定義（!important で確実に適用させる） */
+.bg-black { background-color: #000000 !important; }
+
+.bg-red    { background-color: #cc0000 !important; }
+.bg-blue   { background-color: #0044cc !important; }
+.bg-green  { background-color: #008800 !important; }
+.bg-orange { background-color: #dd6600 !important; }
+.bg-purple { background-color: #6600cc !important; }
+
+/* 準備中（少し暗い色 + 点滅） */
+.bg-red-prep    { background-color: #660000 !important; }
+.bg-blue-prep   { background-color: #002244 !important; }
+.bg-green-prep  { background-color: #003300 !important; }
+.bg-orange-prep { background-color: #663300 !important; }
+.bg-purple-prep { background-color: #2d1a4d !important; }
+
+/* 準備中の点滅アニメーション */
+@keyframes flash-prep { 
+    0%, 100% { opacity: 1; } 
+    50% { opacity: 0.6; } 
+}
+.is-prep { 
+    animation: flash-prep 1.5s infinite; 
 }
