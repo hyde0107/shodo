@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* 01-screen.html 3.txt のスタイルを継承 */
+        /* --- 基本設定 --- */
         #lyrics-guide { 
             font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
             font-size: 3.5vmin;
@@ -26,29 +26,32 @@
             letter-spacing: 0.1em;
             flex-shrink: 0;
         }
+        
+        /* 名前表示 */
         #name-label { 
             font-family: "Hiragino Sans", "Meiryo", sans-serif;
-            font-size: 16vmin; 
+            font-size: 16vmin; /* 基本サイズ */
             font-weight: 900; 
-            line-height: 1.1; 
+            line-height: 1.2; 
             white-space: pre-wrap; 
             text-shadow: 4px 4px 10px rgba(0,0,0,0.8);
             width: 95%;
             word-wrap: break-word;
+            transition: font-size 0.2s;
         }
+        
+        /* 名前が2行になった時用 */
+        #name-label.two-lines-mode {
+            font-size: 12vmin !important; 
+        }
+
         .btn-row { display: flex; gap: 15px; width: 95%; max-width: 600px; justify-content: center; }
         
-        /* 【重要】動画同期バグ対策
-           visibility: hidden; だとブラウザが更新を止めてしまうため、
-           opacity: 0; で「見えないが存在する」状態にします。
-        */
+        /* 動画同期バグ対策 (透明配置) */
         #player-wrapper { 
-            position: fixed;
-            top: 0; left: 0;
-            width: 1px; height: 1px;
-            opacity: 0;
-            z-index: -1;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0;
+            width: 1px; height: 1px; opacity: 0;
+            z-index: -1; pointer-events: none;
         }
     </style>
 </head>
@@ -98,11 +101,13 @@
         const seekBar = document.getElementById('seek-bar');
         const container = document.getElementById('monitor-container');
 
-        // エラーチェック: data02.js が正しく読み込まれたか？
+        // データ読み込みチェック
         let dataSec = [];
+        
+        // window.onloadを待たずに即時チェックしてもOKだが、念のため存在確認
         if (typeof performanceData02 === 'undefined') {
-            alert("【エラー】data02.js が読み込めませんでした。\nHTMLと同じフォルダに data02.js があるか確認してください。");
-            nameEl.innerText = "DATA ERROR";
+            alert("【エラー】data02.js が読み込めませんでした。\n同じフォルダにあるか確認してください。");
+            nameEl.innerText = "DATA LOAD ERROR";
         } else {
             // データを秒数変換して準備
             dataSec = performanceData02.map(d => ({
@@ -110,59 +115,47 @@
             }));
         }
 
-        // 時間変換関数 ("01:23" -> 83秒)
         function parseTime(timeStr) {
             if (!timeStr) return 0;
             const parts = timeStr.split(':');
             return parseInt(parts[0]) * 60 + parseInt(parts[1]);
         }
 
-        // 色判定ロジック (script.jsがなくても動くように内蔵)
+        // --- 色判定ロジック (キーワードで自動判定) ---
         function getMemoInfo(memo) {
             let bgClass = "bg-black";
             let isPrep = false;
             if (!memo) return { bgClass, isPrep };
             
-            if (memo.includes("赤")) bgClass = "bg-red";
+            if (memo.includes("大字")) bgClass = "bg-red";
+            else if (memo.includes("絵")) bgClass = "bg-blue";
+            else if (memo.includes("めくる")) bgClass = "bg-blue";
+            else if (memo.includes("板")) bgClass = "bg-green";
+            else if (memo.includes("色")) bgClass = "bg-orange";
+            else if (memo.includes("退場")) bgClass = "bg-purple";
+            else if (memo.includes("赤")) bgClass = "bg-red";
             else if (memo.includes("青")) bgClass = "bg-blue";
-            else if (memo.includes("緑")) bgClass = "bg-green";
-            else if (memo.includes("橙") || memo.includes("オレンジ")) bgClass = "bg-orange";
-            else if (memo.includes("紫")) bgClass = "bg-purple";
             else if (memo.includes("準備")) {
                 isPrep = true;
-                if (memo.includes("赤")) bgClass = "bg-red-prep";
-                else if (memo.includes("青")) bgClass = "bg-blue-prep";
-                else bgClass = "bg-black";
+                bgClass = "bg-black";
             }
             return { bgClass, isPrep };
         }
 
-        // --- イベント設定 ---
-
-        // 動画の長さがわかったらシークバー設定
-        video.addEventListener('loadedmetadata', () => {
-            seekBar.max = video.duration;
-        });
-
-        // 【重要】同期の要：setIntervalで強制的に画面を更新する (100ms毎)
-        // videoのtimeupdateイベントだけだと、画面オフ時などに止まることがあるため
+        // --- 動画制御 ---
+        video.addEventListener('loadedmetadata', () => { seekBar.max = video.duration; });
+        
+        // 同期ズレ防止のため高頻度更新
         setInterval(updateMonitor, 100);
 
-        // シークバー操作
-        seekBar.addEventListener('input', () => {
-            video.currentTime = seekBar.value;
-        });
+        seekBar.addEventListener('input', () => { video.currentTime = seekBar.value; });
 
-        // 開始ボタン
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
-            video.play().catch(e => {
-                alert("再生エラー: 画面をもう一度タップしてください");
-            });
+            video.play().catch(e => alert("画面をタップしてください"));
             document.getElementById('play-pause-btn').innerText = "一時停止";
         }
 
-        // 再生・一時停止
         function togglePlay() {
             const btn = document.getElementById('play-pause-btn');
             if (!video.paused) {
@@ -178,12 +171,8 @@
             }
         }
 
-        // スキップ
-        function skip(sec) {
-            video.currentTime += sec;
-        }
-
-        // 全画面
+        function skip(sec) { video.currentTime += sec; }
+        
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
                 if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
@@ -194,42 +183,53 @@
             }
         }
 
-        // --- 画面更新ロジック (メイン) ---
+        // --- 画面更新ロジック ---
         function updateMonitor() {
             const currentTime = video.currentTime;
-            
-            // シークバーの更新 (操作中以外)
-            if(document.activeElement !== seekBar) {
-                seekBar.value = currentTime;
-            }
+            if(document.activeElement !== seekBar) seekBar.value = currentTime;
             
             let lastMemoIndex = -1;
             let currentLyrics = "";
 
-            // 現在の再生時間に対応するデータを探す
             for (let i = 0; i < dataSec.length; i++) {
                 if (currentTime >= dataSec[i].s) {
                     currentLyrics = dataSec[i].l;
-                    // メモがある行を記憶
-                    if (dataSec[i].m && dataSec[i].m.trim() !== "") {
-                        lastMemoIndex = i;
-                    }
-                } else {
-                    break;
-                }
+                    if (dataSec[i].m && dataSec[i].m.trim() !== "") lastMemoIndex = i;
+                } else break;
             }
 
-            // 歌詞表示
             lyricsEl.innerText = currentLyrics || "";
 
-            // 指示と背景色更新
             if (lastMemoIndex !== -1) {
                 let memo = dataSec[lastMemoIndex].m;
                 const info = getMemoInfo(memo);
                 
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
-                let names = (parts[1] || "").replace(/・/g, '\n');
+                
+                // --- 名前を2行に収める処理 ---
+                let nameStr = (parts[1] || "").trim();
+                let names = "";
+                
+                if (nameStr) {
+                    // 「・」で分割してリスト化
+                    let nameList = nameStr.split('・');
+                    
+                    if (nameList.length >= 3) {
+                        // 3人以上の場合は半分で折り返して2行にする
+                        let half = Math.ceil(nameList.length / 2);
+                        let line1 = nameList.slice(0, half).join('・');
+                        let line2 = nameList.slice(half).join('・');
+                        names = line1 + "\n" + line2;
+                        
+                        // 文字サイズを少し小さくするクラス追加
+                        nameEl.classList.add('two-lines-mode');
+                    } else {
+                        // 2人以下ならそのまま改行区切り
+                        names = nameList.join('\n');
+                        nameEl.classList.remove('two-lines-mode');
+                    }
+                }
 
                 actionEl.innerText = action;
                 nameEl.innerText = names;
