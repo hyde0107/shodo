@@ -207,3 +207,32 @@ body.monitor-body {
 .is-prep { 
     animation: flash-prep 1.5s infinite; 
 }
+/* --- 以前のコードの末尾に追加してください --- */
+
+/* 全画面切り替えボタン（右上に配置） */
+#fullscreen-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    color: rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+#fullscreen-btn:hover {
+    color: #fff;
+    background: rgba(0,0,0,0.7);
+}
+
+/* モバイル横向き時にアドレスバーを隠すための補助設定 */
+@media screen and (orientation: landscape) {
+    body.monitor-body {
+        min-height: 100vh;
+        /* モバイルブラウザのアドレスバー対策 */
+        min-height: -webkit-fill-available; 
+    }
+}
