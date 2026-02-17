@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>大画面モニター - 指示・名前強調</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Hiragino Sans", "Meiryo", sans-serif;
+            overflow: hidden;
+        }
+
+        #monitor-container {
+            text-align: center;
+            width: 95%;
+        }
+
+        /* 指示内容（色①、準備など） */
+        #action-label {
+            font-size: 6vw;
+            margin-bottom: 2vh;
+            display: block;
+        }
+
+        /* 名前部分（るな、みゆ、など）を最大化 */
+        #name-label {
+            font-size: 18vw; /* 指示より圧倒的に大きく */
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+        }
+
+        /* 色分けクラス */
+        .color-1 { color: #ff4d4d !important; } /* 赤：大字 */
+        .color-2 { color: #3399ff !important; } /* 青：色 */
+        .color-3 { color: #44ff44 !important; } /* 緑：文字 */
+        .color-4 { color: #ffaa00 !important; } /* 橙：スプレー */
+        .color-5 { color: #cc88ff !important; } /* 紫：その他 */
+
+        #player { display: none; } /* 動画は隠す */
+    </style>
+</head>
+<body>
+
+    <div id="monitor-container">
+        <span id="action-label">待機中</span>
+        <span id="name-label"></span>
+    </div>
+    
+    <div id="player"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        // 01.htmlのデータをここに貼り付け
+        const myData = [
+            ["00:00", "歌詞...", "色①、るな・みゆ"],
+            ["00:26", "歌詞...", "スプレー準備、あん・さき"],
+            ["01:30", "歌詞...", "大字、さえ・ひで"],
+            // ...以下、myDataの全データをコピー
+        ];
+
+        function toSeconds(timeStr) {
+            const parts = timeStr.trim().split(':').reverse();
+            let s = parseInt(parts[0], 10) + (parseInt(parts[1], 10) * 60);
+            if (parts[2]) s += (parseInt(parts[2], 10) * 3600);
+            return s;
+        }
+
+        const dataWithSeconds = myData.map(d => ({
+            seconds: toSeconds(d[0]),
+            memo: d[2]
+        }));
+
+        let player;
+        const actionEl = document.getElementById('action-label');
+        const nameEl = document.getElementById('name-label');
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'lN17WxlwdTY',
+                events: { 'onReady': () => setInterval(updateMonitor, 200) }
+            });
+        }
+
+        function updateMonitor() {
+            const currentTime = player.getCurrentTime();
+            let currentMemo = "";
+            for (let i = 0; i < dataWithSeconds.length; i++) {
+                const item = dataWithSeconds[i];
+                const nextItem = dataWithSeconds[i + 1];
+                if (currentTime >= item.seconds && (!nextItem || currentTime < nextItem.seconds)) {
+                    currentMemo = item.memo;
+                    break;
+                }
+            }
+
+            if (currentMemo) {
+                // 読点「、」か「・」で分割して指示と名前に分ける
+                let parts = currentMemo.split(/[、]/);
+                let action = parts[0] || "";
+                let names = parts[1] || "";
+
+                actionEl.innerText = action;
+                nameEl.innerText = names;
+
+                // 色分け判定（指示内容に「大字」などが含まれるか）
+                let colorClass = "color-5";
+                if (action.includes("大字")) colorClass = "color-1";
+                else if (action.includes("色")) colorClass = "color-2";
+                else if (action.includes("文字")) colorClass = "color-3";
+                else if (action.includes("スプレー")) colorClass = "color-4";
+
+                actionEl.className = colorClass;
+                nameEl.className = colorClass;
+            } else {
+                actionEl.innerText = "";
+                nameEl.innerText = "";
+            }
+        }
+    </script>
+</body>
+</html>
