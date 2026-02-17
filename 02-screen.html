@@ -4,55 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>モニターPro - 02 三送会</title>
-    <link rel="stylesheet" href="style.css">
-    
     <style>
-        /* --- 基本設定 --- */
-        #lyrics-guide { 
-            font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-            font-size: 3.5vmin;
-            color: rgba(255,255,255,0.7) !important;
-            margin-bottom: 1vh;
-            min-height: 1.2em;
-            letter-spacing: 0.05em;
-            flex-shrink: 0;
-        }
-        #action-label { 
-            font-family: "Hiragino Sans", "Meiryo", sans-serif;
-            font-size: 8vmin;
-            font-weight: bold; 
-            margin-bottom: 0vh;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            letter-spacing: 0.1em;
-            flex-shrink: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* 名前表示 */
-        #name-label { 
-            font-family: "Hiragino Sans", "Meiryo", sans-serif;
-            font-size: 16vmin; /* 基本サイズ */
-            font-weight: 900; 
-            line-height: 1.2; 
-            white-space: pre-wrap; 
-            text-shadow: 4px 4px 10px rgba(0,0,0,0.8);
-            width: 95%;
-            word-wrap: break-word;
-            transition: font-size 0.2s;
-        }
-        
-        /* 名前が2行になった時用 */
-        #name-label.two-lines-mode {
-            font-size: 12vmin !important; 
+        /* --- 全体のベース --- */
+        body.monitor-body {
+            background-color: #111;
+            color: #fff;
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.5s ease; /* 色が変わる時ふわっとさせる */
         }
 
-        .btn-row { display: flex; gap: 15px; width: 95%; max-width: 600px; justify-content: center; }
+        /* --- 背景色のグラデーション定義 --- */
+        /* 通常（黒）: 少しスポットライト風 */
+        .bg-black { background: radial-gradient(circle at center, #333 0%, #000 100%); }
         
-        /* 動画同期バグ対策 (透明配置) */
-        #player-wrapper { 
-            position: fixed; top: 0; left: 0;
-            width: 1px; height: 1px; opacity: 0;
-            z-index: -1; pointer-events: none;
+        /* 赤（大字など）: 深いクリムゾンレッド */
+        .bg-red   { background: linear-gradient(135deg, #b31217 0%, #570000 100%); }
+        
+        /* 青（絵・めくる）: 鮮やかなロイヤルブルー */
+        .bg-blue  { background: linear-gradient(135deg, #005bea 0%, #002266 100%); }
+        
+        /* 緑（板）: 濃いエメラルド */
+        .bg-green { background: linear-gradient(135deg, #134e5e 0%, #082823 100%); }
+        
+        /* オレンジ（色）: 燃えるようなオレンジ */
+        .bg-orange{ background: linear-gradient(135deg, #ff9966 0%, #cc3300 100%); }
+        
+        /* 紫（退場）: 妖艶なパープル */
+        .bg-purple{ background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); }
+
+        /* 準備中: 黄色と黒の警告色っぽい感じ */
+        .is-prep  { border: 20px solid #ffcc00; }
+
+        /* --- メイン表示エリア --- */
+        #monitor-container {
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            z-index: 10;
         }
+
+        /* 1. 歌詞ガイド */
+        #lyrics-guide { 
+            font-family: "Hiragino Mincho ProN", serif; /* 明朝体で歌詞っぽく */
+            font-size: 3.5vmin;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 2vh;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            letter-spacing: 0.1em;
+            min-height: 1.5em;
+        }
+
+        /* 2. アクション（READYとか大字とか） */
+        #action-label { 
+            display: inline-block;
+            font-size: 6vmin;
+            font-weight: 900; 
+            background: rgba(0,0,0,0.3); /* 半透明の黒背景 */
+            padding: 0.2em 1em;
+            border-radius: 50px; /* 丸くする */
+            border: 2px solid rgba(255,255,255,0.4);
+            margin-bottom: 2vh;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.1em;
+        }
+
+        /* 3. 名前（一番大事） */
+        #name-label { 
+            display: block;
+            font-size: 14vmin; /* ドデカく */
+            font-weight: 900;  /* 激太 */
+            line-height: 1.1; 
+            white-space: pre-wrap; 
+            /* ドロップシャドウで浮き上がらせる */
+            text-shadow: 0px 5px 15px rgba(0,0,0,0.8);
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        /* 名前が2行（3人以上）になった時のスタイル */
+        #name-label.two-lines-mode {
+            font-size: 10vmin !important; /* 少し小さく */
+            line-height: 1.2;
+        }
+
+        /* --- UIパーツ（ボタンなど） --- */
+        #header-controls {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between; z-index: 100;
+        }
+        #back-to-index-btn, #fullscreen-btn {
+            background: rgba(0,0,0,0.5);
+            color: #fff; border: 1px solid #777;
+            padding: 8px 12px; text-decoration: none; font-size: 14px; border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #controls {
+            position: fixed; bottom: 20px; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            z-index: 100; opacity: 0; transition: opacity 0.3s;
+        }
+        /* 画面下半分をタップしたらコントローラーが出るようにする */
+        body:hover #controls { opacity: 1; }
+
+        input[type=range] { width: 80%; max-width: 600px; accent-color: #fff; cursor: pointer; }
+        .btn-row { display: flex; gap: 20px; }
+        .ctrl-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid #fff; color: #fff;
+            padding: 10px 20px; font-size: 16px; border-radius: 30px; cursor: pointer;
+        }
+        .ctrl-btn:active { background: #fff; color: #000; }
+
+        /* 開始ボタンオーバーレイ */
+        #start-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 999; cursor: pointer;
+        }
+        .big-start-btn {
+            border: 3px solid #fff; padding: 40px 60px;
+            font-size: 3rem; font-weight: bold; color: #fff;
+            border-radius: 10px; text-align: center;
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+
+        /* 同期用隠しプレイヤー */
+        #player-wrapper { position: fixed; top:0; left:0; width:1px; height:1px; opacity:0; pointer-events:none; }
+
     </style>
 </head>
 <body class="monitor-body bg-black">
@@ -64,23 +153,24 @@
 
     <div id="start-overlay" onclick="startPerformance()">
         <div class="big-start-btn">
-            練習開始<br>
-            <span style="font-size:1.2rem; font-weight:normal; display:block; margin-top:10px;">(画面をタップ)</span>
+            Tap to Start<br>
+            <span style="font-size:1rem; font-weight:normal; display:block; margin-top:15px; opacity:0.7;">練習開始</span>
         </div>
     </div>
 
     <div id="monitor-container">
-        <div id="lyrics-guide"></div>
+        <div id="lyrics-guide">Stand by...</div>
         <span id="action-label">READY</span>
+        <br>
         <span id="name-label">...</span>
     </div>
 
     <div id="controls">
         <input type="range" id="seek-bar" value="0" step="0.1">
         <div class="btn-row">
-            <button class="ctrl-btn" onclick="skip(-10)">-10秒</button>
-            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">一時停止</button>
-            <button class="ctrl-btn" onclick="skip(10)">+10秒</button>
+            <button class="ctrl-btn" onclick="skip(-5)">-5s</button>
+            <button class="ctrl-btn" id="play-pause-btn" onclick="togglePlay()">PAUSE</button>
+            <button class="ctrl-btn" onclick="skip(5)">+5s</button>
         </div>
     </div>
     
@@ -103,13 +193,10 @@
 
         // データ読み込みチェック
         let dataSec = [];
-        
-        // window.onloadを待たずに即時チェックしてもOKだが、念のため存在確認
         if (typeof performanceData02 === 'undefined') {
-            alert("【エラー】data02.js が読み込めませんでした。\n同じフォルダにあるか確認してください。");
-            nameEl.innerText = "DATA LOAD ERROR";
+            alert("data02.js が読み込めません！");
+            nameEl.innerText = "DATA ERROR";
         } else {
-            // データを秒数変換して準備
             dataSec = performanceData02.map(d => ({
                 s: parseTime(d[0]), l: d[1], m: d[2]
             }));
@@ -144,30 +231,23 @@
 
         // --- 動画制御 ---
         video.addEventListener('loadedmetadata', () => { seekBar.max = video.duration; });
-        
-        // 同期ズレ防止のため高頻度更新
-        setInterval(updateMonitor, 100);
-
+        setInterval(updateMonitor, 100); // 0.1秒ごとに画面更新
         seekBar.addEventListener('input', () => { video.currentTime = seekBar.value; });
 
         function startPerformance() {
             document.getElementById('start-overlay').style.display = 'none';
             video.play().catch(e => alert("画面をタップしてください"));
-            document.getElementById('play-pause-btn').innerText = "一時停止";
+            document.getElementById('play-pause-btn').innerText = "PAUSE";
         }
 
         function togglePlay() {
             const btn = document.getElementById('play-pause-btn');
             if (!video.paused) {
                 video.pause();
-                btn.innerText = "再開";
-                btn.style.backgroundColor = "#fff";
-                btn.style.color = "#000";
+                btn.innerText = "PLAY";
             } else {
                 video.play();
-                btn.innerText = "一時停止";
-                btn.style.backgroundColor = "";
-                btn.style.color = "";
+                btn.innerText = "PAUSE";
             }
         }
 
@@ -183,7 +263,7 @@
             }
         }
 
-        // --- 画面更新ロジック ---
+        // --- メイン表示ロジック ---
         function updateMonitor() {
             const currentTime = video.currentTime;
             if(document.activeElement !== seekBar) seekBar.value = currentTime;
@@ -207,25 +287,17 @@
                 let parts = memo.split(/[、]/);
                 let action = parts[0] || "";
                 
-                // --- 名前を2行に収める処理 ---
+                // 名前処理
                 let nameStr = (parts[1] || "").trim();
                 let names = "";
                 
                 if (nameStr) {
-                    // 「・」で分割してリスト化
                     let nameList = nameStr.split('・');
-                    
                     if (nameList.length >= 3) {
-                        // 3人以上の場合は半分で折り返して2行にする
                         let half = Math.ceil(nameList.length / 2);
-                        let line1 = nameList.slice(0, half).join('・');
-                        let line2 = nameList.slice(half).join('・');
-                        names = line1 + "\n" + line2;
-                        
-                        // 文字サイズを少し小さくするクラス追加
+                        names = nameList.slice(0, half).join('・') + "\n" + nameList.slice(half).join('・');
                         nameEl.classList.add('two-lines-mode');
                     } else {
-                        // 2人以下ならそのまま改行区切り
                         names = nameList.join('\n');
                         nameEl.classList.remove('two-lines-mode');
                     }
@@ -234,10 +306,11 @@
                 actionEl.innerText = action;
                 nameEl.innerText = names;
 
-                if (info.isPrep) container.classList.add('is-prep');
-                else container.classList.remove('is-prep');
+                if (info.isPrep) document.body.classList.add('is-prep');
+                else document.body.classList.remove('is-prep');
 
-                document.body.className = "monitor-body " + info.bgClass;
+                // クラスを全削除して新しい背景色クラスを追加
+                document.body.className = "monitor-body " + info.bgClass + (info.isPrep ? " is-prep" : "");
             }
         }
     </script>
